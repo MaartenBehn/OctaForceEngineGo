@@ -31,7 +31,7 @@ var (
 	vbo uint32
 )
 
-func Start(mainStartUpFunc func()) {
+func startUpWindow() {
 	// Takes in mainStartUpFunc function wich will bw called at the end of this so it has the correct glfw context
 
 	runtime.LockOSThread()
@@ -117,14 +117,12 @@ func Start(mainStartUpFunc func()) {
 
 	angle = 0.0
 	previousTime = glfw.GetTime()
-
-	mainStartUpFunc()
 }
 
 var angle float64
 var previousTime float64
 
-func Update() {
+func updateWindow() {
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
 	// Update
