@@ -20,11 +20,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3abefc9d-9325-4d28-b9c5-4a14d5d5f305" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Main.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Utility.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/OctaForce.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/OctaForce.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Main.go" beforeDir="false" afterPath="$PROJECT_DIR$/Main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/OctaForce.go" beforeDir="false" afterPath="$PROJECT_DIR$/OctaForce.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Window.go" beforeDir="false" afterPath="$PROJECT_DIR$/Window.go" afterDir="false" />
     </list>
@@ -52,6 +49,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="DefaultGoTemplateProperty" value="Go File" />
+    <property name="GO_FMT" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.import.settings.migrated" value="true" />
@@ -72,5 +70,20 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="FPS and UPS system" />
+    <option name="LAST_COMMIT_MESSAGE" value="FPS and UPS system" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1599771688254">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1599771688254" />
+    <state x="1920" y="0" width="1414" height="1027" key="dock-window-1" timestamp="1599774561666">
+      <screen x="1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="1920" y="0" width="1414" height="1027" key="dock-window-1/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1599774561666" />
   </component>
 </project>

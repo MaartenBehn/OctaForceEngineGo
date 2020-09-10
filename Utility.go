@@ -1,10 +1,9 @@
 package OctaForce
 
 // Slices
-func AddFuncToSlice(slicePtr *[]func(), elementPtr func()) int {
-	slice := *slicePtr
+func AddFuncToSlice(slice []func(), elementPtr func()) ([]func(), int) {
 	slice = append(slice, elementPtr)
-	return len(slice) - 1
+	return slice, len(slice) - 1
 }
 func RemoveFuncFromSlice(slicePtr *[]func(), elementIndex int, keepOrder bool) {
 	slice := *slicePtr

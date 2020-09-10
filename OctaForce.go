@@ -4,6 +4,7 @@ func StartUp(gameStartUpFunc func(), gameStopFunc func()) {
 	startUp(gameStartUpFunc, gameStopFunc)
 }
 
+//region Callback
 func AddUpdateCallback(function func()) {
 	addUpdateCallback(function)
 }
@@ -11,7 +12,9 @@ func RemoveUpdateUpCallback(index int) {
 	removeUpdateUpCallback(index)
 }
 
-//<editor-fold desc="fps ups">
+//endregion
+
+//region fps ups
 func SetMaxFPS(maxfps float64) {
 	maxFPS = maxfps
 }
@@ -38,4 +41,4 @@ func GetCappedUPS() float64 {
 	return ups
 }
 
-//</editor-fold>
+//endregion

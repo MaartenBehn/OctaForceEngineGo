@@ -6,7 +6,6 @@ import (
 	"github.com/go-gl/glfw/v3.3/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 	"log"
-	"runtime"
 )
 
 const (
@@ -34,14 +33,7 @@ var (
 func startUpWindow() {
 	// Takes in mainStartUpFunc function wich will bw called at the end of this so it has the correct glfw context
 
-	runtime.LockOSThread()
 	var err error
-
-	// Setting up glfw
-	if err = glfw.Init(); err != nil {
-		log.Fatalln("failed to initialize glfw:", err)
-	}
-	defer glfw.Terminate()
 
 	// Setting up Window
 	glfw.WindowHint(glfw.Resizable, glfw.False)
@@ -147,10 +139,10 @@ func updateWindow() {
 	// Maintenance
 	window.SwapBuffers()
 	glfw.PollEvents()
-}
 
-func WindowClosed() bool {
-	return window.ShouldClose()
+	if window.ShouldClose() {
+		running = false
+	}
 }
 
 var cubeVertices = []float32{

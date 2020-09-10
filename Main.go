@@ -1,10 +1,27 @@
 package OctaForce
 
-import "time"
+import (
+	"github.com/go-gl/glfw/v3.3/glfw"
+	"log"
+	"runtime"
+	"time"
+)
 
 func startUp(gameStartUpFunc func(), gameStopFunc func()) {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	runtime.LockOSThread()
+
 	maxFPS = 60
 	maxUPS = 30
+	running = true
+
+	gameUpadteFuncs = make([]func(), 0)
+
+	// Setting up glfw
+	if err := glfw.Init(); err != nil {
+		log.Fatalln("failed to initialize glfw:", err)
+	}
+	defer glfw.Terminate()
 
 	startUpWindow()
 
@@ -24,7 +41,7 @@ var maxFPS float64
 func runRender() {
 	var startTime = time.Now()
 	var startDuration time.Duration
-	var wait = time.Duration(1 / maxFPS * 1000000000)
+	var wait = time.Duration(1.0 / maxFPS * 1000000000)
 
 	for running {
 		startDuration = time.Since(startTime)
@@ -32,7 +49,13 @@ func runRender() {
 		updateWindow()
 
 		var diff = time.Since(startTime) - startDuration
-		fps = (wait / diff).Seconds() * maxFPS
+
+		if diff > 0 {
+			fps = (wait / diff).Seconds() * maxFPS
+		} else {
+			fps = maxFPS
+		}
+
 		if diff < wait {
 			time.Sleep(wait - diff)
 		}
@@ -45,7 +68,7 @@ var maxUPS float64
 func runUpdate() {
 	var startTime = time.Now()
 	var startDuration time.Duration
-	var wait = time.Duration(1 / maxUPS * 1000000000)
+	var wait = time.Duration(1.0 / maxUPS * 1000000000)
 
 	for running {
 		startDuration = time.Since(startTime)
@@ -53,7 +76,13 @@ func runUpdate() {
 		update()
 
 		var diff = time.Since(startTime) - startDuration
-		ups = (wait / diff).Seconds() * maxFPS
+
+		if diff > 0 {
+			ups = (wait / diff).Seconds() * maxUPS
+		} else {
+			ups = maxUPS
+		}
+
 		if diff < wait {
 			time.Sleep(wait - diff)
 		}
@@ -63,7 +92,9 @@ func runUpdate() {
 var gameUpadteFuncs []func()
 
 func addUpdateCallback(gameUpdatefunc func()) int {
-	return AddFuncToSlice(&gameUpadteFuncs, gameUpdatefunc)
+	var index int
+	gameUpadteFuncs, index = AddFuncToSlice(gameUpadteFuncs, gameUpdatefunc)
+	return index
 }
 func removeUpdateUpCallback(i int) {
 	RemoveFuncFromSlice(&gameUpadteFuncs, i, false)
