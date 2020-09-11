@@ -7,15 +7,13 @@ import (
 	"time"
 )
 
-func startUp(gameStartUpFunc func(), gameStopFunc func()) {
+func StartUp(gameStartUpFunc func(), gameStopFunc func()) {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	runtime.LockOSThread()
 
 	maxFPS = 60
 	maxUPS = 30
 	running = true
-
-	gameUpadteFuncs = make([]func(), 0)
 
 	// Setting up glfw
 	if err := glfw.Init(); err != nil {
@@ -24,6 +22,7 @@ func startUp(gameStartUpFunc func(), gameStopFunc func()) {
 	defer glfw.Terminate()
 
 	startUpWindow()
+	setUpComponentTables()
 
 	gameStartUpFunc()
 
@@ -36,7 +35,22 @@ func startUp(gameStartUpFunc func(), gameStopFunc func()) {
 var running bool
 
 var fps float64
+
+func GetFPS() float64 {
+	return fps
+}
+func GetCappedFPS() float64 {
+	if fps > maxFPS {
+		fps = maxFPS
+	}
+	return fps
+}
+
 var maxFPS float64
+
+func SetMaxFPS(maxfps float64) {
+	maxFPS = maxfps
+}
 
 func runRender() {
 	var startTime = time.Now()
@@ -63,7 +77,22 @@ func runRender() {
 }
 
 var ups float64
+
+func GetUPS() float64 {
+	return ups
+}
+func GetCappedUPS() float64 {
+	if ups > maxUPS {
+		ups = maxUPS
+	}
+	return ups
+}
+
 var maxUPS float64
+
+func SetMaxUPS(maxups float64) {
+	maxUPS = maxups
+}
 
 func runUpdate() {
 	var startTime = time.Now()
@@ -89,19 +118,27 @@ func runUpdate() {
 	}
 }
 
-var gameUpadteFuncs []func()
+var gameUpadteFuncs [20]func()
 
-func addUpdateCallback(gameUpdatefunc func()) int {
-	var index int
-	gameUpadteFuncs, index = AddFuncToSlice(gameUpadteFuncs, gameUpdatefunc)
-	return index
+func AddUpdateCallback(newGameUpdatefunc func()) int {
+	for i, gameUpdatefunc := range gameUpadteFuncs {
+		if gameUpdatefunc == nil {
+			gameUpdatefunc = newGameUpdatefunc
+			return i
+		}
+	}
+
+	return -1
 }
-func removeUpdateUpCallback(i int) {
-	RemoveFuncFromSlice(&gameUpadteFuncs, i, false)
+
+func RemoveUpdateUpCallback(i int) {
+	gameUpadteFuncs[i] = nil
 }
 
 func update() {
 	for _, gameUpadteFunc := range gameUpadteFuncs {
-		gameUpadteFunc()
+		if gameUpadteFunc != nil {
+			gameUpadteFunc()
+		}
 	}
 }
