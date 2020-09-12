@@ -17,16 +17,7 @@ var (
 	window  *glfw.Window
 	version string
 
-	program    uint32
-	projection mgl32.Mat4
-	camera     mgl32.Mat4
-
-	model mgl32.Mat4
-
-	modelUniform   int32
-	textureUniform int32
-
-	mesh Mesh
+	program uint32
 )
 
 func startUpWindow() {
@@ -61,56 +52,25 @@ func startUpWindow() {
 	}
 	gl.UseProgram(program)
 
-	projection = mgl32.Perspective(mgl32.DegToRad(45.0), float32(windowWidth)/windowHeight, 0.1, 10.0)
-	projectionUniform := gl.GetUniformLocation(program, gl.Str("projection\x00"))
-	gl.UniformMatrix4fv(projectionUniform, 1, false, &projection[0])
-
-	camera = mgl32.LookAtV(mgl32.Vec3{3, 3, 3}, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{0, 1, 0})
-	cameraUniform := gl.GetUniformLocation(program, gl.Str("camera\x00"))
-	gl.UniformMatrix4fv(cameraUniform, 1, false, &camera[0])
-
-	model = mgl32.Ident4()
-	modelUniform = gl.GetUniformLocation(program, gl.Str("model\x00"))
-	gl.UniformMatrix4fv(modelUniform, 1, false, &model[0])
-
-	textureUniform = gl.GetUniformLocation(program, gl.Str("tex\x00"))
-	gl.Uniform1i(textureUniform, 0)
-
-	gl.BindFragDataLocation(program, 0, gl.Str("outputColor\x00"))
-
-	// Load the texture
-	texture, err := newTexture("square.png")
-	if err != nil {
-		panic(err)
-	}
-
 	mesh := Mesh{
 		Vertices: []Vertex{
 			{
-				Position: mgl32.Vec3{0, 1, 0},
-				Normals:  mgl32.Vec3{1, 0, 0},
-				UV:       mgl32.Vec2{0, 0}},
+				Position: mgl32.Vec3{-0.5, -0.5, 0.0},
+			},
 			{
-				Position: mgl32.Vec3{1, 0, 0},
-				Normals:  mgl32.Vec3{1, 0, 0},
-				UV:       mgl32.Vec2{1, 0}},
+				Position: mgl32.Vec3{0.5, -0.5, 0.0},
+			},
 			{
-				Position: mgl32.Vec3{-1, 0, 0},
-				Normals:  mgl32.Vec3{1, 0, 0},
-				UV:       mgl32.Vec2{0, 1}},
+				Position: mgl32.Vec3{0.0, 0.5, 0.0},
+			},
 		},
-		Indices:  []uint32{2, 1, 0},
-		Textures: []Texture{texture},
 	}
-	mesh.setUpMesh()
+	mesh.updateMeshData()
+	activeMeshes = append(activeMeshes, mesh)
+	updateAllMeshData()
 
 	// Configure global settings
-	gl.Enable(gl.DEPTH_TEST)
-	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0, 0, 0, 0)
-
-	angle = 0.0
-	previousTime = glfw.GetTime()
 }
 
 func newProgram() (uint32, error) {
@@ -149,25 +109,13 @@ func newProgram() (uint32, error) {
 	return program, nil
 }
 
-var angle float64
-var previousTime float64
-
 func updateWindow() {
-	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+	gl.ClearColor(0, 0, 0, 0)
+	gl.Clear(gl.COLOR_BUFFER_BIT)
 
-	// Update
-	time := glfw.GetTime()
-	elapsed := time - previousTime
-	previousTime = time
-
-	angle += elapsed
-	model = mgl32.HomogRotate3D(float32(angle), mgl32.Vec3{0, 1, 0})
-
-	// Render
 	gl.UseProgram(program)
-	gl.UniformMatrix4fv(modelUniform, 1, false, &model[0])
 
-	mesh.renderMesh()
+	renderMeshes()
 
 	// Maintenance
 	window.SwapBuffers()
@@ -176,55 +124,4 @@ func updateWindow() {
 	if window.ShouldClose() {
 		running = false
 	}
-}
-
-var cubeVertices = []float32{
-	//  X, Y, Z, U, V
-	// Bottom
-	-1.0, -1.0, -1.0, 0.0, 0.0,
-	1.0, -1.0, -1.0, 1.0, 0.0,
-	-1.0, -1.0, 1.0, 0.0, 1.0,
-	1.0, -1.0, -1.0, 1.0, 0.0,
-	1.0, -1.0, 1.0, 1.0, 1.0,
-	-1.0, -1.0, 1.0, 0.0, 1.0,
-
-	// Top
-	-1.0, 1.0, -1.0, 0.0, 0.0,
-	-1.0, 1.0, 1.0, 0.0, 1.0,
-	1.0, 1.0, -1.0, 1.0, 0.0,
-	1.0, 1.0, -1.0, 1.0, 0.0,
-	-1.0, 1.0, 1.0, 0.0, 1.0,
-	1.0, 1.0, 1.0, 1.0, 1.0,
-
-	// Front
-	-1.0, -1.0, 1.0, 1.0, 0.0,
-	1.0, -1.0, 1.0, 0.0, 0.0,
-	-1.0, 1.0, 1.0, 1.0, 1.0,
-	1.0, -1.0, 1.0, 0.0, 0.0,
-	1.0, 1.0, 1.0, 0.0, 1.0,
-	-1.0, 1.0, 1.0, 1.0, 1.0,
-
-	// Back
-	-1.0, -1.0, -1.0, 0.0, 0.0,
-	-1.0, 1.0, -1.0, 0.0, 1.0,
-	1.0, -1.0, -1.0, 1.0, 0.0,
-	1.0, -1.0, -1.0, 1.0, 0.0,
-	-1.0, 1.0, -1.0, 0.0, 1.0,
-	1.0, 1.0, -1.0, 1.0, 1.0,
-
-	// Left
-	-1.0, -1.0, 1.0, 0.0, 1.0,
-	-1.0, 1.0, -1.0, 1.0, 0.0,
-	-1.0, -1.0, -1.0, 0.0, 0.0,
-	-1.0, -1.0, 1.0, 0.0, 1.0,
-	-1.0, 1.0, 1.0, 1.0, 1.0,
-	-1.0, 1.0, -1.0, 1.0, 0.0,
-
-	// Right
-	1.0, -1.0, 1.0, 1.0, 1.0,
-	1.0, -1.0, -1.0, 1.0, 0.0,
-	1.0, 1.0, -1.0, 0.0, 0.0,
-	1.0, -1.0, 1.0, 1.0, 1.0,
-	1.0, 1.0, -1.0, 0.0, 0.0,
-	1.0, 1.0, 1.0, 0.0, 1.0,
 }

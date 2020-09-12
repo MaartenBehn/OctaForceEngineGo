@@ -1,11 +1,6 @@
 #version 330
-uniform mat4 projection;
-uniform mat4 camera;
-uniform mat4 model;
-in vec3 vert;
-in vec2 vertTexCoord;
-out vec2 fragTexCoord;
+layout(location = 0) in vec3 vert;
+
 void main() {
-    fragTexCoord = vertTexCoord;
-    gl_Position = projection * camera * model * vec4(vert, 1);
+    gl_Position = vec4(vert, 1);
 }
