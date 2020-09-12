@@ -5,7 +5,7 @@ import (
 	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/go-gl/glfw/v3.3/glfw"
 	"github.com/go-gl/mathgl/mgl32"
-	"log"
+	"strings"
 )
 
 const (
@@ -21,13 +21,12 @@ var (
 	projection mgl32.Mat4
 	camera     mgl32.Mat4
 
-	model          mgl32.Mat4
+	model mgl32.Mat4
+
 	modelUniform   int32
 	textureUniform int32
-	texture        uint32
 
-	vao uint32
-	vbo uint32
+	mesh Mesh
 )
 
 func startUpWindow() {
@@ -47,7 +46,7 @@ func startUpWindow() {
 	}
 	window.MakeContextCurrent()
 
-	// Initialize Glow
+	// Initialize Gl
 	if err = gl.Init(); err != nil {
 		panic(err)
 	}
@@ -56,7 +55,7 @@ func startUpWindow() {
 	fmt.Println("OpenGL version", version)
 
 	// Configure the vertex and fragment shaders
-	program, err = newProgram(vertexShader, fragmentShader)
+	program, err = newProgram()
 	if err != nil {
 		panic(err)
 	}
@@ -80,35 +79,74 @@ func startUpWindow() {
 	gl.BindFragDataLocation(program, 0, gl.Str("outputColor\x00"))
 
 	// Load the texture
-	texture, err = newTexture("square.png")
+	texture, err := newTexture("square.png")
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 
-	// Configure the vertex data
-
-	gl.GenVertexArrays(1, &vao)
-	gl.BindVertexArray(vao)
-
-	gl.GenBuffers(1, &vbo)
-	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
-	gl.BufferData(gl.ARRAY_BUFFER, len(cubeVertices)*4, gl.Ptr(cubeVertices), gl.STATIC_DRAW)
-
-	vertAttrib := uint32(gl.GetAttribLocation(program, gl.Str("vert\x00")))
-	gl.EnableVertexAttribArray(vertAttrib)
-	gl.VertexAttribPointer(vertAttrib, 3, gl.FLOAT, false, 5*4, gl.PtrOffset(0))
-
-	texCoordAttrib := uint32(gl.GetAttribLocation(program, gl.Str("vertTexCoord\x00")))
-	gl.EnableVertexAttribArray(texCoordAttrib)
-	gl.VertexAttribPointer(texCoordAttrib, 2, gl.FLOAT, false, 5*4, gl.PtrOffset(3*4))
+	mesh := Mesh{
+		Vertices: []Vertex{
+			{
+				Position: mgl32.Vec3{0, 1, 0},
+				Normals:  mgl32.Vec3{1, 0, 0},
+				UV:       mgl32.Vec2{0, 0}},
+			{
+				Position: mgl32.Vec3{1, 0, 0},
+				Normals:  mgl32.Vec3{1, 0, 0},
+				UV:       mgl32.Vec2{1, 0}},
+			{
+				Position: mgl32.Vec3{-1, 0, 0},
+				Normals:  mgl32.Vec3{1, 0, 0},
+				UV:       mgl32.Vec2{0, 1}},
+		},
+		Indices:  []uint32{2, 1, 0},
+		Textures: []Texture{texture},
+	}
+	mesh.setUpMesh()
 
 	// Configure global settings
 	gl.Enable(gl.DEPTH_TEST)
 	gl.DepthFunc(gl.LESS)
-	gl.ClearColor(1.0, 1.0, 1.0, 1.0)
+	gl.ClearColor(0, 0, 0, 0)
 
 	angle = 0.0
 	previousTime = glfw.GetTime()
+}
+
+func newProgram() (uint32, error) {
+
+	vertexShader, err := compileShader("H:\\dev\\Go\\src\\OctaForceEngineGo\\shader\\vertexShader.shader", gl.VERTEX_SHADER)
+	if err != nil {
+		return 0, err
+	}
+
+	fragmentShader, err := compileShader("H:\\dev\\Go\\src\\OctaForceEngineGo\\shader\\fragmentShader.shader", gl.FRAGMENT_SHADER)
+	if err != nil {
+		return 0, err
+	}
+
+	program := gl.CreateProgram()
+
+	gl.AttachShader(program, vertexShader)
+	gl.AttachShader(program, fragmentShader)
+	gl.LinkProgram(program)
+
+	var status int32
+	gl.GetProgramiv(program, gl.LINK_STATUS, &status)
+	if status == gl.FALSE {
+		var logLength int32
+		gl.GetProgramiv(program, gl.INFO_LOG_LENGTH, &logLength)
+
+		log := strings.Repeat("\x00", int(logLength+1))
+		gl.GetProgramInfoLog(program, logLength, nil, gl.Str(log))
+
+		return 0, fmt.Errorf("failed to link program: %v", log)
+	}
+
+	gl.DeleteShader(vertexShader)
+	gl.DeleteShader(fragmentShader)
+
+	return program, nil
 }
 
 var angle float64
@@ -129,12 +167,7 @@ func updateWindow() {
 	gl.UseProgram(program)
 	gl.UniformMatrix4fv(modelUniform, 1, false, &model[0])
 
-	gl.BindVertexArray(vao)
-
-	gl.ActiveTexture(gl.TEXTURE0)
-	gl.BindTexture(gl.TEXTURE_2D, texture)
-
-	gl.DrawArrays(gl.TRIANGLES, 0, 6*2*3)
+	mesh.renderMesh()
 
 	// Maintenance
 	window.SwapBuffers()

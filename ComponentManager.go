@@ -19,8 +19,6 @@ type Transform struct {
 	Rotation mgl32.Vec3
 	Scale    mgl32.Vec3
 }
-type Mesh struct {
-}
 type Camera struct {
 }
 
@@ -56,6 +54,10 @@ func DeleteEntity(id int) {
 	delete(components, id)
 }
 
+func HasEntity(entityId int) bool {
+	return components[entityId] != nil
+}
+
 func AddComponent(entityId int, componentId int) {
 	components[entityId][componentId] = component{
 		id:         componentId,
@@ -65,6 +67,10 @@ func AddComponent(entityId int, componentId int) {
 
 func RemoveComponent(entityId int, componentId int) {
 	delete(components[entityId], componentId)
+}
+
+func HasComponent(entityId int, componentId int) bool {
+	return components[entityId][componentId].data != nil
 }
 
 func GetComponent(entityId int, componentId int) interface{} {
