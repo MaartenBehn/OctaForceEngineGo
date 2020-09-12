@@ -1,6 +1,8 @@
 #version 330
-layout(location = 0) in vec3 vert;
+uniform mat4 projection;
+uniform mat4 camera;
+in vec3 vert;
 
 void main() {
-    gl_Position = vec4(vert, 1);
+    gl_Position = projection * camera  * vec4(vert, 1);
 }

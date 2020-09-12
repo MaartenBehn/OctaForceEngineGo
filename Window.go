@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	windowWidth  = 800
-	windowHeight = 600
+	windowWidth  = 1920
+	windowHeight = 1080
 )
 
 var (
@@ -52,13 +52,23 @@ func startUpWindow() {
 	}
 	gl.UseProgram(program)
 
+	camera := mgl32.LookAtV(mgl32.Vec3{0, 0, 10}, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{0, 1, 0})
+	cameraUniform := gl.GetUniformLocation(program, gl.Str("camera\x00"))
+	gl.UniformMatrix4fv(cameraUniform, 1, false, &camera[0])
+
+	projection := mgl32.Perspective(mgl32.DegToRad(45.0), float32(windowWidth)/windowHeight, 0.1, 10.0)
+	projectionUniform := gl.GetUniformLocation(program, gl.Str("projection\x00"))
+	gl.UniformMatrix4fv(projectionUniform, 1, false, &projection[0])
+
+	gl.BindFragDataLocation(program, 0, gl.Str("outputColor\x00"))
+
 	mesh := Mesh{
 		Vertices: []Vertex{
 			{
-				Position: mgl32.Vec3{-0.5, -0.5, 0.0},
+				Position: mgl32.Vec3{0.5, -0.5, 0.0},
 			},
 			{
-				Position: mgl32.Vec3{0.5, -0.5, 0.0},
+				Position: mgl32.Vec3{-0.5, -0.5, 0.0},
 			},
 			{
 				Position: mgl32.Vec3{0.0, 0.5, 0.0},
@@ -75,12 +85,12 @@ func startUpWindow() {
 
 func newProgram() (uint32, error) {
 
-	vertexShader, err := compileShader("H:\\dev\\Go\\src\\OctaForceEngineGo\\shader\\vertexShader.shader", gl.VERTEX_SHADER)
+	vertexShader, err := compileShader(absPath+"/shader/vertexShader.shader", gl.VERTEX_SHADER)
 	if err != nil {
 		return 0, err
 	}
 
-	fragmentShader, err := compileShader("H:\\dev\\Go\\src\\OctaForceEngineGo\\shader\\fragmentShader.shader", gl.FRAGMENT_SHADER)
+	fragmentShader, err := compileShader(absPath+"/shader/fragmentShader.shader", gl.FRAGMENT_SHADER)
 	if err != nil {
 		return 0, err
 	}

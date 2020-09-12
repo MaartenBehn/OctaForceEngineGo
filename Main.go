@@ -3,9 +3,17 @@ package OctaForce
 import (
 	"github.com/go-gl/glfw/v3.3/glfw"
 	"log"
+	"path/filepath"
 	"runtime"
 	"time"
 )
+
+var absPath string
+
+func init() {
+	_, b, _, _ := runtime.Caller(0)
+	absPath = filepath.Dir(b)
+}
 
 func StartUp(gameStartUpFunc func(), gameStopFunc func()) {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
@@ -23,6 +31,8 @@ func StartUp(gameStartUpFunc func(), gameStopFunc func()) {
 
 	startUpWindow()
 	setUpComponentTables()
+
+	activeMeshes = append(activeMeshes, LoadOBJ(absPath+"/mesh/cube.obj"))
 
 	gameStartUpFunc()
 
