@@ -62,23 +62,6 @@ func startUpWindow() {
 
 	gl.BindFragDataLocation(program, 0, gl.Str("outputColor\x00"))
 
-	mesh := Mesh{
-		Vertices: []Vertex{
-			{
-				Position: mgl32.Vec3{0.5, -0.5, 0.0},
-			},
-			{
-				Position: mgl32.Vec3{-0.5, -0.5, 0.0},
-			},
-			{
-				Position: mgl32.Vec3{0.0, 0.5, 0.0},
-			},
-		},
-	}
-	mesh.updateMeshData()
-	activeMeshes = append(activeMeshes, mesh)
-	updateAllMeshData()
-
 	// Configure global settings
 	gl.ClearColor(0, 0, 0, 0)
 }

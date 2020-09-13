@@ -22,6 +22,7 @@ func StartUp(gameStartUpFunc func(), gameStopFunc func()) {
 	maxFPS = 60
 	maxUPS = 30
 	running = true
+	needAllMeshUpdate = false
 
 	// Setting up glfw
 	if err := glfw.Init(); err != nil {
@@ -31,8 +32,6 @@ func StartUp(gameStartUpFunc func(), gameStopFunc func()) {
 
 	startUpWindow()
 	setUpComponentTables()
-
-	activeMeshes = append(activeMeshes, LoadOBJ(absPath+"/mesh/cube.obj"))
 
 	gameStartUpFunc()
 
@@ -146,6 +145,12 @@ func RemoveUpdateUpCallback(i int) {
 }
 
 func update() {
+	updateAllComponents()
+
+	if needAllMeshUpdate {
+		updateAllMeshData()
+	}
+
 	for _, gameUpadteFunc := range gameUpadteFuncs {
 		if gameUpadteFunc != nil {
 			gameUpadteFunc()
