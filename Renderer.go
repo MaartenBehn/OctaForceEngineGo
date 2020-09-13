@@ -8,11 +8,17 @@ import (
 )
 
 var (
-	version    string
-	program    uint32
-	projection mgl32.Mat4
-	camera     mgl32.Mat4
-	transform  mgl32.Mat4
+	version string
+	program uint32
+
+	projection        mgl32.Mat4
+	projectionUniform int32
+
+	camera        mgl32.Mat4
+	cameraUniform int32
+
+	glTransform      mgl32.Mat4
+	transformUniform int32
 )
 
 func setUpRenderer() {
@@ -34,7 +40,7 @@ func setUpRenderer() {
 		panic(err)
 	}
 
-	program := gl.CreateProgram()
+	program = gl.CreateProgram()
 	gl.AttachShader(program, vertexShader)
 	gl.AttachShader(program, fragmentShader)
 	gl.LinkProgram(program)
@@ -54,19 +60,19 @@ func setUpRenderer() {
 	gl.UseProgram(program)
 
 	// Perspective Projection matrix
-	projection := mgl32.Perspective(mgl32.DegToRad(45.0), float32(windowWidth)/windowHeight, 0.1, 10.0)
-	projectionUniform := gl.GetUniformLocation(program, gl.Str("projection\x00"))
+	projection = mgl32.Perspective(mgl32.DegToRad(45.0), float32(windowWidth)/windowHeight, 0.1, 10.0)
+	projectionUniform = gl.GetUniformLocation(program, gl.Str("projection\x00"))
 	gl.UniformMatrix4fv(projectionUniform, 1, false, &projection[0])
 
 	// Camera matrix
-	camera := mgl32.LookAtV(mgl32.Vec3{0, 0, 10}, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{0, 1, 0})
-	cameraUniform := gl.GetUniformLocation(program, gl.Str("camera\x00"))
+	camera = mgl32.LookAtV(mgl32.Vec3{0, 0, 10}, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{0, 1, 0})
+	cameraUniform = gl.GetUniformLocation(program, gl.Str("camera\x00"))
 	gl.UniformMatrix4fv(cameraUniform, 1, false, &camera[0])
 
-	// Object transform matrix
-	transform = mgl32.Mat4{}
-	transformUniform := gl.GetUniformLocation(program, gl.Str("transform\x00"))
-	gl.UniformMatrix4fv(transformUniform, 1, false, &transform[0])
+	// Object glTransform matrix
+	glTransform = mgl32.Ident4()
+	transformUniform = gl.GetUniformLocation(program, gl.Str("transform\x00"))
+	gl.UniformMatrix4fv(transformUniform, 1, false, &glTransform[0])
 
 	// Output Data Flag
 	gl.BindFragDataLocation(program, 0, gl.Str("outputColor\x00"))

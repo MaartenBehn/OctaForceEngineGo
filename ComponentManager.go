@@ -1,7 +1,5 @@
 package OctaForce
 
-import "github.com/go-gl/mathgl/mgl32"
-
 const (
 	COMPONENT_Transform = 1
 	COMPONENT_Mesh      = 2
@@ -20,31 +18,12 @@ type component struct {
 	data interface{}
 }
 
-type Transform struct {
-	Position mgl32.Vec3
-	Rotation mgl32.Vec3
-	Scale    mgl32.Vec3
-}
-type Camera struct {
-}
-
-var idCounter int
 var components map[int]map[int]component
-
-var dataTable map[int]interface{}
 var dependencyTable map[int][]int
 var funcTable map[int]map[int]func(data interface{}) interface{}
 
 func setUpComponentTables() {
 	components = map[int]map[int]component{}
-
-	dataTable = map[int]interface{}{}
-	dataTable[COMPONENT_Transform] = Transform{
-		Position: mgl32.Vec3{0, 0, 0},
-		Rotation: mgl32.Vec3{0, 0, 0},
-		Scale:    mgl32.Vec3{1, 1, 1}}
-	dataTable[COMPONENT_Mesh] = Mesh{}
-	dataTable[COMPONENT_Camera] = Camera{}
 
 	dependencyTable = map[int][]int{}
 	dependencyTable[COMPONENT_Transform] = []int{}
@@ -53,12 +32,18 @@ func setUpComponentTables() {
 
 	funcTable = map[int]map[int]func(data interface{}) interface{}{}
 	funcTable[COMPONENT_Transform] = map[int]func(data interface{}) interface{}{}
+	funcTable[COMPONENT_Transform][component_func_Add] = setUpTransform
+	funcTable[COMPONENT_Transform][component_func_Set] = setTransformMatrix
 
 	funcTable[COMPONENT_Mesh] = map[int]func(data interface{}) interface{}{}
+	funcTable[COMPONENT_Mesh][component_func_Add] = setUpMesh
 	funcTable[COMPONENT_Mesh][component_func_Set] = updateMeshData
 
 	funcTable[COMPONENT_Camera] = map[int]func(data interface{}) interface{}{}
+	funcTable[COMPONENT_Camera][component_func_Add] = setUpCamera
 }
+
+var idCounter int
 
 func CreateEntity() int {
 	idCounter++
@@ -71,11 +56,20 @@ func DeleteEntity(id int) {
 func HasEntity(entityId int) bool {
 	return components[entityId] != nil
 }
+func GetAllEntitiesWithComponent(id int) []int {
+	var entities []int
+	for entityId, _ := range components {
+		if HasComponent(entityId, id) {
+			entities = append(entities, entityId)
+		}
+	}
+	return entities
+}
 
 func AddComponent(entityId int, componentId int) interface{} {
 	component := component{
 		id:   componentId,
-		data: dataTable[componentId],
+		data: funcTable[componentId][component_func_Add](nil),
 	}
 	components[entityId][componentId] = component
 
@@ -83,11 +77,6 @@ func AddComponent(entityId int, componentId int) interface{} {
 		if !HasComponent(entityId, dependency) {
 			AddComponent(entityId, dependency)
 		}
-	}
-
-	if funcTable[componentId][component_func_Add] != nil {
-		component.data = funcTable[componentId][component_func_Add](component.data)
-		components[entityId][componentId] = component
 	}
 	return component.data
 }
@@ -122,7 +111,9 @@ func GetComponent(entityId int, componentId int) interface{} {
 func GetAllComponentsOfId(id int) []interface{} {
 	var datas []interface{}
 	for entityId, _ := range components {
-		datas = append(datas, components[entityId][id].data)
+		if HasComponent(entityId, id) {
+			datas = append(datas, components[entityId][id].data)
+		}
 	}
 	return datas
 }

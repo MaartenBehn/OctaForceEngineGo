@@ -20,6 +20,9 @@ type Mesh struct {
 	vertexData []float32
 }
 
+func setUpMesh(data interface{}) interface{} {
+	return Mesh{}
+}
 func updateMeshData(data interface{}) interface{} {
 	mesh := data.(Mesh)
 	mesh.vertexData = []float32{}
@@ -90,12 +93,17 @@ func renderMeshes() {
 	gl.BindVertexArray(vao)
 	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo)
 
-	/*datas := GetAllComponentsOfId(COMPONENT_Mesh)
-	for i, data := range datas {
-		mesh := data
+	indexCounter := 0
+	entities := GetAllEntitiesWithComponent(COMPONENT_Mesh)
+	for _, entityId := range entities {
+		glTransform = GetComponent(entityId, COMPONENT_Transform).(Transform).Matrix
+		gl.UniformMatrix4fv(transformUniform, 1, false, &glTransform[0])
 
-	}*/
-	gl.DrawElements(gl.TRIANGLES, int32(len(allIndexData)), gl.UNSIGNED_INT, nil)
+		mesh := GetComponent(entityId, COMPONENT_Mesh).(Mesh)
+		gl.DrawElements(gl.TRIANGLES, int32(indexCounter+len(mesh.Indices)), gl.UNSIGNED_INT, nil)
+		indexCounter += len(mesh.Indices)
+	}
+
 }
 
 func LoadOBJ(path string) Mesh {
