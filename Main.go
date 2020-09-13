@@ -14,7 +14,6 @@ func init() {
 	_, b, _, _ := runtime.Caller(0)
 	absPath = filepath.Dir(b)
 }
-
 func StartUp(gameStartUpFunc func(), gameStopFunc func()) {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	runtime.LockOSThread()
@@ -30,7 +29,8 @@ func StartUp(gameStartUpFunc func(), gameStopFunc func()) {
 	}
 	defer glfw.Terminate()
 
-	startUpWindow()
+	setUpWindow()
+	setUpRenderer()
 	setUpComponentTables()
 
 	gameStartUpFunc()
@@ -60,7 +60,6 @@ var maxFPS float64
 func SetMaxFPS(maxfps float64) {
 	maxFPS = maxfps
 }
-
 func runRender() {
 	var startTime = time.Now()
 	var startDuration time.Duration
@@ -69,6 +68,8 @@ func runRender() {
 	for running {
 		startDuration = time.Since(startTime)
 
+		// All render Calls
+		updateRenderer()
 		updateWindow()
 
 		var diff = time.Since(startTime) - startDuration
@@ -102,7 +103,6 @@ var maxUPS float64
 func SetMaxUPS(maxups float64) {
 	maxUPS = maxups
 }
-
 func runUpdate() {
 	var startTime = time.Now()
 	var startDuration time.Duration
@@ -111,7 +111,9 @@ func runUpdate() {
 	for running {
 		startDuration = time.Since(startTime)
 
-		update()
+		// All update Calls
+		updateAllComponents()
+		performGameUpdateFuncs()
 
 		var diff = time.Since(startTime) - startDuration
 
@@ -139,18 +141,10 @@ func AddUpdateCallback(newGameUpdatefunc func()) int {
 
 	return -1
 }
-
 func RemoveUpdateUpCallback(i int) {
 	gameUpadteFuncs[i] = nil
 }
-
-func update() {
-	updateAllComponents()
-
-	if needAllMeshUpdate {
-		updateAllMeshData()
-	}
-
+func performGameUpdateFuncs() {
 	for _, gameUpadteFunc := range gameUpadteFuncs {
 		if gameUpadteFunc != nil {
 			gameUpadteFunc()

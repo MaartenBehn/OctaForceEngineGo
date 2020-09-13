@@ -16,10 +16,8 @@ const (
 )
 
 type component struct {
-	id         int
-	data       interface{}
-	dependency []int
-	dataFuncs  map[int]func(data interface{}) interface{}
+	id   int
+	data interface{}
 }
 
 type Transform struct {
@@ -50,7 +48,7 @@ func setUpComponentTables() {
 
 	dependencyTable = map[int][]int{}
 	dependencyTable[COMPONENT_Transform] = []int{}
-	dependencyTable[COMPONENT_Mesh] = []int{}
+	dependencyTable[COMPONENT_Mesh] = []int{COMPONENT_Transform}
 	dependencyTable[COMPONENT_Camera] = []int{}
 
 	funcTable = map[int]map[int]func(data interface{}) interface{}{}
@@ -70,74 +68,72 @@ func CreateEntity() int {
 func DeleteEntity(id int) {
 	delete(components, id)
 }
-
 func HasEntity(entityId int) bool {
 	return components[entityId] != nil
 }
 
-func updateAllComponents() {
-	for i, entity := range components {
-		for j, component := range entity {
-			if component.dataFuncs[component_func_Update] != nil {
-				component.data = component.dataFuncs[component_func_Update](component.data)
-				components[i][j] = component
-			}
-		}
-	}
-}
-
 func AddComponent(entityId int, componentId int) interface{} {
 	component := component{
-		id:         componentId,
-		data:       dataTable[componentId],
-		dependency: dependencyTable[componentId],
-		dataFuncs:  funcTable[componentId],
-	}
-
-	if component.dataFuncs[component_func_Add] != nil {
-		component.data = component.dataFuncs[component_func_Add](component.data)
+		id:   componentId,
+		data: dataTable[componentId],
 	}
 	components[entityId][componentId] = component
+
+	for _, dependency := range dependencyTable[componentId] {
+		if !HasComponent(entityId, dependency) {
+			AddComponent(entityId, dependency)
+		}
+	}
+
+	if funcTable[componentId][component_func_Add] != nil {
+		component.data = funcTable[componentId][component_func_Add](component.data)
+		components[entityId][componentId] = component
+	}
 	return component.data
 }
-
 func RemoveComponent(entityId int, componentId int) {
 	component := components[entityId][componentId]
-	if component.dataFuncs[component_func_Remove] != nil {
-		component.data = component.dataFuncs[component_func_Remove](component.data)
+	if funcTable[componentId][component_func_Remove] != nil {
+		component.data = funcTable[componentId][component_func_Remove](component.data)
 		components[entityId][componentId] = component
 	}
 	delete(components[entityId], componentId)
 }
-
+func SetComponent(entityId int, componentId int, data interface{}) {
+	component := components[entityId][componentId]
+	if funcTable[componentId][component_func_Set] != nil {
+		component.data = funcTable[componentId][component_func_Set](data)
+	} else {
+		component.data = data
+	}
+	components[entityId][componentId] = component
+}
 func HasComponent(entityId int, componentId int) bool {
 	return components[entityId][componentId].data != nil
 }
-
 func GetComponent(entityId int, componentId int) interface{} {
 	component := components[entityId][componentId]
-	if component.dataFuncs[component_func_Get] != nil {
-		component.data = component.dataFuncs[component_func_Get](component.data)
+	if funcTable[componentId][component_func_Get] != nil {
+		component.data = funcTable[componentId][component_func_Get](component.data)
 		components[entityId][componentId] = component
 	}
 	return component.data
 }
-
-func SetComponent(entityId int, componentId int, data interface{}) {
-	component := components[entityId][componentId]
-	component.data = data
-	components[entityId][componentId] = component
-
-	if component.dataFuncs[component_func_Set] != nil {
-		component.data = component.dataFuncs[component_func_Set](component.data)
-		components[entityId][componentId] = component
-	}
-}
-
 func GetAllComponentsOfId(id int) []interface{} {
 	var datas []interface{}
 	for entityId, _ := range components {
 		datas = append(datas, components[entityId][id].data)
 	}
 	return datas
+}
+
+func updateAllComponents() {
+	for i, entity := range components {
+		for j, component := range entity {
+			if funcTable[j][component_func_Update] != nil {
+				component.data = funcTable[j][component_func_Update](component.data)
+				components[i][j] = component
+			}
+		}
+	}
 }

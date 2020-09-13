@@ -14,7 +14,6 @@ type Vertex struct {
 	Normal   mgl32.Vec3
 	UVCord   mgl32.Vec2
 }
-
 type Mesh struct {
 	Vertices   []Vertex
 	Indices    []uint32
@@ -45,7 +44,6 @@ func updateMeshData(data interface{}) interface{} {
 
 var allVertexData []float32
 var allIndexData []uint32
-
 var vao uint32
 var vbo uint32
 var ebo uint32
@@ -85,9 +83,18 @@ func updateAllMeshData() {
 }
 
 func renderMeshes() {
+	if needAllMeshUpdate {
+		updateAllMeshData()
+	}
 
 	gl.BindVertexArray(vao)
 	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo)
+
+	/*datas := GetAllComponentsOfId(COMPONENT_Mesh)
+	for i, data := range datas {
+		mesh := data
+
+	}*/
 	gl.DrawElements(gl.TRIANGLES, int32(len(allIndexData)), gl.UNSIGNED_INT, nil)
 }
 
