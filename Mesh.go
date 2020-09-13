@@ -46,7 +46,7 @@ func updateMeshData(data interface{}) interface{} {
 }
 
 var allVertexData []float32
-var allIndexData []uint32
+var activeMeshes []int
 var vao uint32
 var vbo uint32
 var ebo uint32
@@ -56,11 +56,11 @@ const stride int32 = 8 * 4
 var needAllMeshUpdate bool
 
 func updateAllMeshData() {
-	datas := GetAllComponentsOfId(COMPONENT_Mesh)
+	activeMeshes = GetAllEntitiesWithComponent(COMPONENT_Mesh)
 	allVertexData = []float32{}
-	allIndexData = []uint32{}
-	for _, data := range datas {
-		mesh := data.(Mesh)
+	var allIndexData []uint32
+	for _, meshId := range activeMeshes {
+		mesh := GetComponent(meshId, COMPONENT_Mesh).(Mesh)
 		allVertexData = append(allVertexData, mesh.vertexData...)
 		allIndexData = append(allIndexData, mesh.Indices...)
 	}
@@ -94,13 +94,12 @@ func renderMeshes() {
 	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo)
 
 	indexCounter := 0
-	entities := GetAllEntitiesWithComponent(COMPONENT_Mesh)
-	for _, entityId := range entities {
+	for _, entityId := range activeMeshes {
 		glTransform = GetComponent(entityId, COMPONENT_Transform).(Transform).Matrix
 		gl.UniformMatrix4fv(transformUniform, 1, false, &glTransform[0])
 
 		mesh := GetComponent(entityId, COMPONENT_Mesh).(Mesh)
-		gl.DrawElements(gl.TRIANGLES, int32(indexCounter+len(mesh.Indices)), gl.UNSIGNED_INT, nil)
+		gl.DrawElements(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_INT, gl.PtrOffset(indexCounter*4))
 		indexCounter += len(mesh.Indices)
 	}
 

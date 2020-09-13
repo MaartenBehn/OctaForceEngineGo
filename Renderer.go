@@ -60,7 +60,7 @@ func setUpRenderer() {
 	gl.UseProgram(program)
 
 	// Perspective Projection matrix
-	projection = mgl32.Perspective(mgl32.DegToRad(45.0), float32(windowWidth)/windowHeight, 0.1, 10.0)
+	projection = mgl32.Perspective(mgl32.DegToRad(45.0), float32(windowWidth)/windowHeight, 0.1, 100000.0)
 	projectionUniform = gl.GetUniformLocation(program, gl.Str("projection\x00"))
 	gl.UniformMatrix4fv(projectionUniform, 1, false, &projection[0])
 
@@ -78,6 +78,8 @@ func setUpRenderer() {
 	gl.BindFragDataLocation(program, 0, gl.Str("outputColor\x00"))
 
 	// Global settings
+	//gl.Enable(gl.DEPTH_TEST)
+	//gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0, 0, 0, 0)
 }
 
