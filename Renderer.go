@@ -11,14 +11,15 @@ var (
 	version string
 	program uint32
 
+	vao uint32
+	vbo uint32
+	ebo uint32
+
 	projection        mgl32.Mat4
 	projectionUniform int32
 
 	camera        mgl32.Mat4
 	cameraUniform int32
-
-	glTransform      mgl32.Mat4
-	transformUniform int32
 )
 
 func setUpRenderer() {
@@ -69,10 +70,16 @@ func setUpRenderer() {
 	cameraUniform = gl.GetUniformLocation(program, gl.Str("camera\x00"))
 	gl.UniformMatrix4fv(cameraUniform, 1, false, &camera[0])
 
-	// Object glTransform matrix
-	glTransform = mgl32.Ident4()
-	transformUniform = gl.GetUniformLocation(program, gl.Str("transform\x00"))
-	gl.UniformMatrix4fv(transformUniform, 1, false, &glTransform[0])
+	gl.GenVertexArrays(1, &vao)
+	gl.GenBuffers(1, &vbo)
+	gl.GenBuffers(1, &ebo)
+	gl.BindVertexArray(vao)
+
+	vertAttrib := uint32(gl.GetAttribLocation(program, gl.Str("vert\x00")))
+	gl.EnableVertexAttribArray(vertAttrib)
+	gl.VertexAttribPointer(vertAttrib, 3, gl.FLOAT, false, stride, gl.PtrOffset(0))
+
+	gl.BindVertexArray(0)
 
 	// Output Data Flag
 	gl.BindFragDataLocation(program, 0, gl.Str("outputColor\x00"))
@@ -81,10 +88,34 @@ func setUpRenderer() {
 	//gl.Enable(gl.DEPTH_TEST)
 	//gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0, 0, 0, 0)
+
 }
 
 func updateRenderer() {
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 	gl.UseProgram(program)
 	renderMeshes()
+}
+
+func renderMeshes() {
+	datas := GetAllComponentsOfId(COMPONENT_Mesh)
+	var allVertexData []float32
+	var allIndexData []uint32
+	for _, data := range datas {
+		mesh := data.(Mesh)
+		allVertexData = append(allVertexData, mesh.vertexData...)
+		allIndexData = append(allIndexData, mesh.Indices...)
+	}
+
+	gl.BindVertexArray(vao)
+
+	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
+	gl.BufferData(gl.ARRAY_BUFFER, len(allVertexData)*4, gl.Ptr(allVertexData), gl.STATIC_DRAW)
+
+	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo)
+	gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(allIndexData)*4, gl.Ptr(allIndexData), gl.STATIC_DRAW)
+
+	gl.DrawElements(gl.TRIANGLES, int32(len(allIndexData)), gl.UNSIGNED_INT, nil)
+
+	gl.BindVertexArray(0)
 }

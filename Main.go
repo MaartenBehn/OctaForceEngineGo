@@ -21,7 +21,6 @@ func StartUp(gameStartUpFunc func(), gameStopFunc func()) {
 	maxFPS = 60
 	maxUPS = 30
 	running = true
-	needAllMeshUpdate = false
 
 	// Setting up glfw
 	if err := glfw.Init(); err != nil {

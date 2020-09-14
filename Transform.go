@@ -21,7 +21,7 @@ func setUpTransform(data interface{}) interface{} {
 func setTransformMatrix(data interface{}) interface{} {
 	transform := data.(Transform)
 	transform.Matrix = mgl32.Ident4()
-	transform.Matrix = glTransform.Add(mgl32.Translate3D(
+	transform.Matrix = transform.Matrix.Add(mgl32.Translate3D(
 		transform.Position.X(),
 		transform.Position.Y(),
 		transform.Position.Z()))
