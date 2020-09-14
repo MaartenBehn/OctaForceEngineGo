@@ -1,4 +1,4 @@
-package OctaForce
+package OF
 
 import (
 	"github.com/go-gl/glfw/v3.3/glfw"
@@ -13,6 +13,7 @@ var window *glfw.Window
 
 func setUpWindow() {
 	var err error
+
 	// Setting up Window
 	glfw.WindowHint(glfw.Resizable, glfw.False)
 	glfw.WindowHint(glfw.ContextVersionMajor, 4)

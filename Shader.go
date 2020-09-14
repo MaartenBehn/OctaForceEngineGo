@@ -1,4 +1,4 @@
-package OctaForce
+package OF
 
 import (
 	"fmt"

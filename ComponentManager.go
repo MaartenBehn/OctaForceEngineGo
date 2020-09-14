@@ -1,4 +1,4 @@
-package OctaForce
+package OF
 
 const (
 	COMPONENT_Transform = 1
@@ -28,7 +28,7 @@ func setUpComponentTables() {
 	dependencyTable = map[int][]int{}
 	dependencyTable[COMPONENT_Transform] = []int{}
 	dependencyTable[COMPONENT_Mesh] = []int{COMPONENT_Transform}
-	dependencyTable[COMPONENT_Camera] = []int{}
+	dependencyTable[COMPONENT_Camera] = []int{COMPONENT_Transform}
 
 	funcTable = map[int]map[int]func(data interface{}) interface{}{}
 	funcTable[COMPONENT_Transform] = map[int]func(data interface{}) interface{}{}
@@ -37,7 +37,7 @@ func setUpComponentTables() {
 
 	funcTable[COMPONENT_Mesh] = map[int]func(data interface{}) interface{}{}
 	funcTable[COMPONENT_Mesh][component_func_Add] = setUpMesh
-	funcTable[COMPONENT_Mesh][component_func_Set] = updateMeshData
+	funcTable[COMPONENT_Mesh][component_func_Remove] = deleteMesh
 
 	funcTable[COMPONENT_Camera] = map[int]func(data interface{}) interface{}{}
 	funcTable[COMPONENT_Camera][component_func_Add] = setUpCamera

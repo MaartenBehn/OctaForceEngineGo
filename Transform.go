@@ -1,4 +1,4 @@
-package OctaForce
+package OF
 
 import "github.com/go-gl/mathgl/mgl32"
 
@@ -9,7 +9,7 @@ type Transform struct {
 	Matrix   mgl32.Mat4
 }
 
-func setUpTransform(data interface{}) interface{} {
+func setUpTransform(component interface{}) interface{} {
 	transform := Transform{
 		Position: mgl32.Vec3{0, 0, 0},
 		Rotation: mgl32.Vec3{0, 0, 0},
@@ -21,12 +21,12 @@ func setUpTransform(data interface{}) interface{} {
 func setTransformMatrix(data interface{}) interface{} {
 	transform := data.(Transform)
 	transform.Matrix = mgl32.Ident4()
-	transform.Matrix = glTransform.Add(mgl32.Translate3D(
+	transform.Matrix = transform.Matrix.Mul4(mgl32.HomogRotate3D(transform.Rotation.X(), mgl32.Vec3{1, 0, 0}))
+	transform.Matrix = transform.Matrix.Mul4(mgl32.HomogRotate3D(transform.Rotation.Y(), mgl32.Vec3{0, 1, 0}))
+	transform.Matrix = transform.Matrix.Mul4(mgl32.HomogRotate3D(transform.Rotation.Z(), mgl32.Vec3{0, 0, 1}))
+	transform.Matrix = transform.Matrix.Mul4(mgl32.Translate3D(
 		transform.Position.X(),
 		transform.Position.Y(),
 		transform.Position.Z()))
-	//transform.Matrix = glTransform.Mul4(mgl32.HomogRotate3DX(transform.Rotation.X()))
-	//transform.Matrix = glTransform.Mul4(mgl32.HomogRotate3DX(transform.Rotation.Y()))
-	//transform.Matrix = glTransform.Mul4(mgl32.HomogRotate3DX(transform.Rotation.Z()))
 	return transform
 }
