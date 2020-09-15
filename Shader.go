@@ -1,4 +1,4 @@
-package OF
+package OctaForceEngine
 
 import (
 	"fmt"

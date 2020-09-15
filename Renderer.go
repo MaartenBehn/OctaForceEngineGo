@@ -1,4 +1,4 @@
-package OF
+package OctaForceEngine
 
 import (
 	"fmt"
@@ -75,6 +75,9 @@ func setUpRenderer() {
 	//gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0, 0, 0, 0)
 }
+
+// SetActiveCameraEntity sets the given entity as the camera. The given entity must have a camera component.
+// This function does not check that, so be careful.
 func SetActiveCameraEntity(entityId int) {
 	cameraEntityId = entityId
 }

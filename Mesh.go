@@ -1,4 +1,4 @@
-package OF
+package OctaForceEngine
 
 import (
 	"github.com/go-gl/mathgl/mgl32"
@@ -31,6 +31,7 @@ func deleteMesh(data interface{}) interface{} {
 	return nil
 }
 
+// LoadOBJ returns the mesh struct of the given OBJ file.
 func LoadOBJ(path string) Mesh {
 
 	content, err := ioutil.ReadFile(path)
