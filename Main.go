@@ -22,18 +22,18 @@ func StartUp(gameStartUpFunc func(), gameStopFunc func()) {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	runtime.LockOSThread()
 
-	// setting var vaules
+	// setting var values
 	maxFPS = 60
 	maxUPS = 30
 	running = true
 
-	// Initilising vars
+	// Initialising vars
 	// Setting up glfw
 	if err := glfw.Init(); err != nil {
 		log.Fatalln("failed to initialize glfw:", err)
 	}
 	defer glfw.Terminate()
-	gameUpadteFuncs = map[int]func(){}
+	gameUpdateFuncMap = map[int]func(){}
 
 	// internal setup calls
 	setUpWindow()
@@ -43,7 +43,7 @@ func StartUp(gameStartUpFunc func(), gameStopFunc func()) {
 	// parsed game setup call
 	gameStartUpFunc() //(I need to do it in that way because somehow the glfw context only applies if a func is in the stack higher than the init call.)
 
-	go runUpdate() // Running the update calls on sperat thread.
+	go runUpdate() // Running the update calls on sprat thread.
 	runRender()    // The render calls needs run on the main tread so the glfw init call system still applies.
 
 	gameStopFunc()
@@ -70,8 +70,8 @@ func GetCappedFPS() float64 {
 
 var maxFPS float64
 
-func SetMaxFPS(maxfps float64) {
-	maxFPS = maxfps
+func SetMaxFPS(_maxFPS float64) {
+	maxFPS = _maxFPS
 }
 func runRender() {
 	var startTime = time.Now()
@@ -118,8 +118,8 @@ func GetCappedUPS() float64 {
 
 var maxUPS float64
 
-func SetMaxUPS(maxups float64) {
-	maxUPS = maxups
+func SetMaxUPS(_maxUPS float64) {
+	maxUPS = _maxUPS
 }
 func runUpdate() {
 	var startTime = time.Now()
@@ -131,7 +131,7 @@ func runUpdate() {
 
 		// All update Calls
 		updateAllComponents()
-		performGameUpdateFuncs()
+		performGameUpdateFunctions()
 
 		var diff = time.Since(startTime) - startDuration
 
@@ -147,24 +147,24 @@ func runUpdate() {
 	}
 }
 
-var gameUpadteFuncs map[int]func()
+var gameUpdateFuncMap map[int]func()
 var gameUpdateFuncCounter int
 
 // AddUpdateCallback adds the given function to a map with a random int id.
 // The given function will be called every engine update.
 // The returned int is the id of the function in the map.
-func AddUpdateCallback(newGameUpdatefunc func()) int {
+func AddUpdateCallback(newGameUpdateFunc func()) int {
 	gameUpdateFuncCounter++
-	gameUpadteFuncs[gameUpdateFuncCounter] = newGameUpdatefunc
+	gameUpdateFuncMap[gameUpdateFuncCounter] = newGameUpdateFunc
 	return gameUpdateFuncCounter
 }
 
 // RemoveUpdateCallback removes the function at the given int id.
 func RemoveUpdateCallback(id int) {
-	gameUpadteFuncs[id] = nil
+	gameUpdateFuncMap[id] = nil
 }
-func performGameUpdateFuncs() {
-	for _, gameUpadteFunc := range gameUpadteFuncs {
-		gameUpadteFunc()
+func performGameUpdateFunctions() {
+	for _, gameUpdateFunc := range gameUpdateFuncMap {
+		gameUpdateFunc()
 	}
 }

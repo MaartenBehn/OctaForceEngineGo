@@ -6,8 +6,11 @@ type Camera struct {
 	projection mgl32.Mat4
 }
 
-func setUpCamera(data interface{}) interface{} {
+func setUpCamera(_ interface{}) interface{} {
 	return Camera{
-		projection: mgl32.Perspective(mgl32.DegToRad(45.0), float32(windowWidth)/windowHeight, 0.1, 100000.0),
+		projection: mgl32.Perspective(mgl32.DegToRad(45.0),
+			float32(windowWidth)/windowHeight,
+			0.1,
+			100000.0),
 	}
 }

@@ -9,7 +9,7 @@ type Transform struct {
 	Matrix   mgl32.Mat4
 }
 
-func setUpTransform(component interface{}) interface{} {
+func setUpTransform(_ interface{}) interface{} {
 	transform := Transform{
 		Position: mgl32.Vec3{0, 0, 0},
 		Rotation: mgl32.Vec3{0, 0, 0},

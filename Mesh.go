@@ -22,7 +22,7 @@ type Mesh struct {
 	ebo               uint32
 }
 
-func setUpMesh(data interface{}) interface{} {
+func setUpMesh(_ interface{}) interface{} {
 	return Mesh{}
 }
 func deleteMesh(data interface{}) interface{} {
@@ -80,6 +80,7 @@ func LoadOBJ(path string) Mesh {
 		for _, values := range face {
 			vertexIndex := values[0] - 1
 			mesh.Indices = append(mesh.Indices, vertexIndex)
+			//goland:noinspection GoNilness
 			mesh.Vertices[vertexIndex].Position = vertices[vertexIndex]
 			//mesh.Vertices[vertexIndex].UVCord = uvCord[values[1] -1]
 			//mesh.Vertices[vertexIndex].Normal = normals[values[2] -1]
@@ -92,10 +93,10 @@ func LoadOBJ(path string) Mesh {
 }
 
 func parseFloat(number string) float32 {
-	float, _ := strconv.ParseFloat(number, 32)
-	return float32(float)
+	floatVar, _ := strconv.ParseFloat(number, 32)
+	return float32(floatVar)
 }
 func parseInt(number string) uint32 {
-	int, _ := strconv.ParseInt(number, 10, 32)
-	return uint32(int)
+	intVar, _ := strconv.ParseInt(number, 10, 32)
+	return uint32(intVar)
 }

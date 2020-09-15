@@ -1,16 +1,16 @@
 package OctaForceEngine
 
 const (
-	COMPONENT_Transform = 1
-	COMPONENT_Mesh      = 2
-	COMPONENT_Camera    = 3
+	ComponentTransform = 1
+	ComponentMesh      = 2
+	ComponentCamera    = 3
 )
 const (
-	component_func_Add    = 0
-	component_func_Update = 1
-	component_func_Get    = 2
-	component_func_Set    = 3
-	component_func_Remove = 4
+	componentFuncAdd    = 0
+	componentFuncUpdate = 1
+	componentFuncGet    = 2
+	componentFuncSet    = 3
+	componentFuncRemove = 4
 )
 
 type component struct {
@@ -26,21 +26,21 @@ func setUpComponentTables() {
 	components = map[int]map[int]component{}
 
 	dependencyTable = map[int][]int{}
-	dependencyTable[COMPONENT_Transform] = []int{}
-	dependencyTable[COMPONENT_Mesh] = []int{COMPONENT_Transform}
-	dependencyTable[COMPONENT_Camera] = []int{COMPONENT_Transform}
+	dependencyTable[ComponentTransform] = []int{}
+	dependencyTable[ComponentMesh] = []int{ComponentTransform}
+	dependencyTable[ComponentCamera] = []int{ComponentTransform}
 
 	funcTable = map[int]map[int]func(data interface{}) interface{}{}
-	funcTable[COMPONENT_Transform] = map[int]func(data interface{}) interface{}{}
-	funcTable[COMPONENT_Transform][component_func_Add] = setUpTransform
-	funcTable[COMPONENT_Transform][component_func_Set] = setTransformMatrix
+	funcTable[ComponentTransform] = map[int]func(data interface{}) interface{}{}
+	funcTable[ComponentTransform][componentFuncAdd] = setUpTransform
+	funcTable[ComponentTransform][componentFuncSet] = setTransformMatrix
 
-	funcTable[COMPONENT_Mesh] = map[int]func(data interface{}) interface{}{}
-	funcTable[COMPONENT_Mesh][component_func_Add] = setUpMesh
-	funcTable[COMPONENT_Mesh][component_func_Remove] = deleteMesh
+	funcTable[ComponentMesh] = map[int]func(data interface{}) interface{}{}
+	funcTable[ComponentMesh][componentFuncAdd] = setUpMesh
+	funcTable[ComponentMesh][componentFuncRemove] = deleteMesh
 
-	funcTable[COMPONENT_Camera] = map[int]func(data interface{}) interface{}{}
-	funcTable[COMPONENT_Camera][component_func_Add] = setUpCamera
+	funcTable[ComponentCamera] = map[int]func(data interface{}) interface{}{}
+	funcTable[ComponentCamera][componentFuncAdd] = setUpCamera
 }
 
 var idCounter int
@@ -78,7 +78,7 @@ func GetAllEntitiesWithComponent(id int) []int {
 func AddComponent(entityId int, componentId int) interface{} {
 	component := component{
 		id:   componentId,
-		data: funcTable[componentId][component_func_Add](nil),
+		data: funcTable[componentId][componentFuncAdd](nil),
 	}
 	components[entityId][componentId] = component
 
@@ -94,8 +94,8 @@ func AddComponent(entityId int, componentId int) interface{} {
 // Will not check if any components are dependent on it before it is removed.
 func RemoveComponent(entityId int, componentId int) {
 	component := components[entityId][componentId]
-	if funcTable[componentId][component_func_Remove] != nil {
-		component.data = funcTable[componentId][component_func_Remove](component.data)
+	if funcTable[componentId][componentFuncRemove] != nil {
+		component.data = funcTable[componentId][componentFuncRemove](component.data)
 		components[entityId][componentId] = component
 	}
 	delete(components[entityId], componentId)
@@ -104,8 +104,8 @@ func RemoveComponent(entityId int, componentId int) {
 // SetComponent sets the value of given component on given entity.
 func SetComponent(entityId int, componentId int, data interface{}) {
 	component := components[entityId][componentId]
-	if funcTable[componentId][component_func_Set] != nil {
-		component.data = funcTable[componentId][component_func_Set](data)
+	if funcTable[componentId][componentFuncSet] != nil {
+		component.data = funcTable[componentId][componentFuncSet](data)
 	} else {
 		component.data = data
 	}
@@ -120,8 +120,8 @@ func HasComponent(entityId int, componentId int) bool {
 // GetComponent returns copy of the value of given component on given entity.
 func GetComponent(entityId int, componentId int) interface{} {
 	component := components[entityId][componentId]
-	if funcTable[componentId][component_func_Get] != nil {
-		component.data = funcTable[componentId][component_func_Get](component.data)
+	if funcTable[componentId][componentFuncGet] != nil {
+		component.data = funcTable[componentId][componentFuncGet](component.data)
 		components[entityId][componentId] = component
 	}
 	return component.data
@@ -129,20 +129,20 @@ func GetComponent(entityId int, componentId int) interface{} {
 
 // GetAllComponentsOfId returns a slice of all copied values of components of given id.
 func GetAllComponentsOfId(id int) []interface{} {
-	var datas []interface{}
+	var dataset []interface{}
 	for entityId, _ := range components {
 		if HasComponent(entityId, id) {
-			datas = append(datas, components[entityId][id].data)
+			dataset = append(dataset, components[entityId][id].data)
 		}
 	}
-	return datas
+	return dataset
 }
 
 func updateAllComponents() {
 	for i, entity := range components {
 		for j, component := range entity {
-			if funcTable[j][component_func_Update] != nil {
-				component.data = funcTable[j][component_func_Update](component.data)
+			if funcTable[j][componentFuncUpdate] != nil {
+				component.data = funcTable[j][componentFuncUpdate](component.data)
 				components[i][j] = component
 			}
 		}

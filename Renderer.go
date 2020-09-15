@@ -86,16 +86,16 @@ func updateRenderer() {
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 	gl.UseProgram(program)
 
-	cameraTransform := GetComponent(cameraEntityId, COMPONENT_Transform).(Transform)
+	cameraTransform := GetComponent(cameraEntityId, ComponentTransform).(Transform)
 	// Creating inverted Camera pos
 	cameraPosMatrix := mgl32.Translate3D(cameraTransform.Position.X()*-2, cameraTransform.Position.Y()*-2, cameraTransform.Position.Z()*-2)
 	cameraPosMatrix = cameraPosMatrix.Mul4(cameraTransform.Matrix)
 	gl.UniformMatrix4fv(cameraTransformUniform, 1, false, &cameraPosMatrix[0])
 
-	camera := GetComponent(cameraEntityId, COMPONENT_Camera).(Camera)
+	camera := GetComponent(cameraEntityId, ComponentCamera).(Camera)
 	gl.UniformMatrix4fv(projectionUniform, 1, false, &camera.projection[0])
 
-	entities := GetAllEntitiesWithComponent(COMPONENT_Mesh)
+	entities := GetAllEntitiesWithComponent(ComponentMesh)
 	for _, entity := range entities {
 		renderEntity(entity)
 	}
@@ -108,7 +108,7 @@ func updateRenderer() {
 const stride int32 = 8 * 4
 
 func renderEntity(entityId int) {
-	mesh := GetComponent(entityId, COMPONENT_Mesh).(Mesh)
+	mesh := GetComponent(entityId, ComponentMesh).(Mesh)
 
 	if mesh.NeedsRenderUpdate {
 		var vertexData []float32
@@ -144,13 +144,13 @@ func renderEntity(entityId int) {
 
 		mesh.NeedsRenderUpdate = false
 
-		SetComponent(entityId, COMPONENT_Mesh, mesh)
+		SetComponent(entityId, ComponentMesh, mesh)
 
 	} else {
 		gl.BindVertexArray(mesh.vao)
 	}
 
-	transform := GetComponent(entityId, COMPONENT_Transform).(Transform)
+	transform := GetComponent(entityId, ComponentTransform).(Transform)
 	gl.UniformMatrix4fv(transformUniform, 1, false, &transform.Matrix[0])
 
 	gl.DrawElements(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_INT, nil)

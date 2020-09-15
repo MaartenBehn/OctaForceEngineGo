@@ -28,7 +28,7 @@ func newTexture(file string) (Texture, error) {
 	if rgba.Stride != rgba.Rect.Size().X*4 {
 		return Texture{}, fmt.Errorf("unsupported stride")
 	}
-	draw.Draw(rgba, rgba.Bounds(), img, image.Point{0, 0}, draw.Src)
+	draw.Draw(rgba, rgba.Bounds(), img, image.Point{}, draw.Src)
 
 	texture := Texture{}
 	gl.GenTextures(1, &texture.Id)
