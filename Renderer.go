@@ -3,7 +3,6 @@ package OctaForceEngine
 import (
 	"fmt"
 	"github.com/go-gl/gl/v4.1-core/gl"
-	"github.com/go-gl/mathgl/mgl32"
 	"strings"
 )
 
@@ -57,14 +56,8 @@ func setUpRenderer() {
 	gl.UseProgram(program)
 
 	// Perspective Projection matrix
-	//projection = mgl32.Perspective(mgl32.DegToRad(45.0), float32(windowWidth)/windowHeight, 0.1, 100000.0)
 	projectionUniform = gl.GetUniformLocation(program, gl.Str("projection\x00"))
-
-	// Camera matrix
-	//cameraTransform = mgl32.LookAtV(mgl32.Vec3{0, 0, 10}, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{0, 1, 0})
 	cameraTransformUniform = gl.GetUniformLocation(program, gl.Str("camera\x00"))
-	//gl.UniformMatrix4fv(cameraTransformUniform, 1, false, &camera[0])
-
 	transformUniform = gl.GetUniformLocation(program, gl.Str("transform\x00"))
 
 	// Output data Flag
@@ -88,9 +81,8 @@ func updateRenderer() {
 
 	cameraTransform := GetComponent(cameraEntityId, ComponentTransform).(Transform)
 	// Creating inverted Camera pos
-	cameraPosMatrix := mgl32.Translate3D(cameraTransform.Position.X()*-2, cameraTransform.Position.Y()*-2, cameraTransform.Position.Z()*-2)
-	cameraPosMatrix = cameraPosMatrix.Mul4(cameraTransform.Matrix)
-	gl.UniformMatrix4fv(cameraTransformUniform, 1, false, &cameraPosMatrix[0])
+	view := cameraTransform.matrix.Inv()
+	gl.UniformMatrix4fv(cameraTransformUniform, 1, false, &view[0])
 
 	camera := GetComponent(cameraEntityId, ComponentCamera).(Camera)
 	gl.UniformMatrix4fv(projectionUniform, 1, false, &camera.projection[0])
@@ -151,7 +143,7 @@ func renderEntity(entityId int) {
 	}
 
 	transform := GetComponent(entityId, ComponentTransform).(Transform)
-	gl.UniformMatrix4fv(transformUniform, 1, false, &transform.Matrix[0])
+	gl.UniformMatrix4fv(transformUniform, 1, false, &transform.matrix[0])
 
 	gl.DrawElements(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_INT, nil)
 }

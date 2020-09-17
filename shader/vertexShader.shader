@@ -5,5 +5,5 @@ uniform mat4 transform;
 in vec3 vert;
 
 void main() {
-    gl_Position = projection * camera * transform * vec4(vert, 1);
+    gl_Position =  projection * camera * transform * vec4(vert, 1);
 }
