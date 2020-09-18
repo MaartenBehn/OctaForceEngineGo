@@ -4,7 +4,6 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 	"io/ioutil"
 	"log"
-	"strconv"
 	"strings"
 )
 
@@ -20,6 +19,7 @@ type Mesh struct {
 	vao               uint32
 	vbo               uint32
 	ebo               uint32
+	Material          Material
 }
 
 func setUpMesh(_ interface{}) interface{} {
@@ -32,7 +32,7 @@ func deleteMesh(data interface{}) interface{} {
 }
 
 // LoadOBJ returns the mesh struct of the given OBJ file.
-func LoadOBJ(path string) Mesh {
+func LoadOBJ(path string, loadMaterials bool) Mesh {
 
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -44,10 +44,17 @@ func LoadOBJ(path string) Mesh {
 	var normals []mgl32.Vec3
 	var uvCord []mgl32.Vec2
 	var faces [][3][3]uint32
+	var material Material
 	for _, line := range lines {
-
 		values := strings.Split(line, " ")
+		values[len(values)-1] = strings.Replace(values[len(values)-1], "\r", "", 1)
+
 		switch values[0] {
+		case "mtllib":
+			if loadMaterials {
+				material = LoadMtl("mesh" + values[1])[0]
+			}
+			break
 		case "v":
 			vertices = append(vertices, mgl32.Vec3{parseFloat(values[1]), parseFloat(values[2]), parseFloat(values[3])})
 			break
@@ -76,6 +83,7 @@ func LoadOBJ(path string) Mesh {
 
 	mesh := Mesh{}
 	mesh.Vertices = make([]Vertex, len(vertices))
+	mesh.Material = material
 	for _, face := range faces {
 		for _, values := range face {
 			vertexIndex := values[0] - 1
@@ -90,19 +98,4 @@ func LoadOBJ(path string) Mesh {
 	mesh.NeedsRenderUpdate = true
 
 	return mesh
-}
-
-func parseFloat(number string) float32 {
-	if strings.Contains(number, "\r") {
-		number = strings.Replace(number, "\r", "", -1)
-	}
-	floatVar, _ := strconv.ParseFloat(number, 32)
-	return float32(floatVar)
-}
-func parseInt(number string) uint32 {
-	if strings.Contains(number, "\r") {
-		number = strings.Replace(number, "\r", "", -1)
-	}
-	intVar, _ := strconv.ParseInt(number, 10, 32)
-	return uint32(intVar)
 }

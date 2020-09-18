@@ -97,7 +97,7 @@ func updateRenderer() {
 	deleteUnUsedVAOs()
 }
 
-const stride int32 = 8 * 4
+const stride int32 = 6 * 4
 
 func renderEntity(entityId int) {
 	mesh := GetComponent(entityId, ComponentMesh).(Mesh)
@@ -110,12 +110,9 @@ func renderEntity(entityId int) {
 				vertex.Position.Y(),
 				vertex.Position.Z(),
 
-				vertex.Normal.X(),
-				vertex.Normal.Y(),
-				vertex.Normal.Z(),
-
-				vertex.UVCord.X(),
-				vertex.UVCord.Y(),
+				mesh.Material.DiffuseColor.X(),
+				mesh.Material.DiffuseColor.Y(),
+				mesh.Material.DiffuseColor.Z(),
 			}...)
 		}
 
@@ -130,9 +127,13 @@ func renderEntity(entityId int) {
 		gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.ebo)
 		gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(mesh.Indices)*4, gl.Ptr(mesh.Indices), gl.STATIC_DRAW)
 
-		vertAttrib := uint32(gl.GetAttribLocation(program, gl.Str("vert\x00")))
-		gl.EnableVertexAttribArray(vertAttrib)
-		gl.VertexAttribPointer(vertAttrib, 3, gl.FLOAT, false, stride, gl.PtrOffset(0))
+		vertexPositionAttrib := uint32(gl.GetAttribLocation(program, gl.Str("vertexPosition\x00")))
+		gl.EnableVertexAttribArray(vertexPositionAttrib)
+		gl.VertexAttribPointer(vertexPositionAttrib, 3, gl.FLOAT, false, stride, gl.PtrOffset(0))
+
+		vertexColorAttrib := uint32(gl.GetAttribLocation(program, gl.Str("vertexColor\x00")))
+		gl.EnableVertexAttribArray(vertexColorAttrib)
+		gl.VertexAttribPointer(vertexColorAttrib, 3, gl.FLOAT, false, stride, gl.PtrOffset(3*4))
 
 		mesh.NeedsRenderUpdate = false
 

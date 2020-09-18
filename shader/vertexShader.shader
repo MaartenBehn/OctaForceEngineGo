@@ -2,8 +2,11 @@
 uniform mat4 projection;
 uniform mat4 camera;
 uniform mat4 transform;
-in vec3 vert;
+in vec3 vertexPosition;
+in vec3 vertexColor;
+out vec3 color;
 
 void main() {
-    gl_Position =  projection * camera * transform * vec4(vert, 1);
+    color = vertexColor;
+    gl_Position =  projection * camera * transform * vec4(vertexPosition, 1);
 }
