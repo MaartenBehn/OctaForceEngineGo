@@ -72,9 +72,9 @@ func (transform *Transform) Rotate(vec3 mgl32.Vec3) {
 func (transform *Transform) CalcRotationMatrix() {
 	transform.rotationMatrix = mgl32.Ident4()
 	transform.rotationMatrix = transform.rotationMatrix.Mul4(mgl32.HomogRotate3D(
-		transform.rotation.X(), mgl32.Vec3{1, 0, 0}))
-	transform.rotationMatrix = transform.rotationMatrix.Mul4(mgl32.HomogRotate3D(
 		transform.rotation.Y(), mgl32.Vec3{0, 1, 0}))
+	transform.rotationMatrix = transform.rotationMatrix.Mul4(mgl32.HomogRotate3D(
+		transform.rotation.X(), mgl32.Vec3{1, 0, 0}))
 	transform.rotationMatrix = transform.rotationMatrix.Mul4(mgl32.HomogRotate3D(
 		transform.rotation.Z(), mgl32.Vec3{0, 0, 1}))
 }

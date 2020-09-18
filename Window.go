@@ -3,6 +3,7 @@ package OctaForceEngine
 import "C"
 import (
 	"github.com/go-gl/glfw/v3.3/glfw"
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 const (
@@ -26,15 +27,22 @@ func setUpWindow() {
 		panic(err)
 	}
 	window.MakeContextCurrent()
+}
 
+func renderWindow() {
+	window.SwapBuffers()
+	glfw.PollEvents()
 }
 
 func updateWindow() {
-	window.SwapBuffers()
-	glfw.PollEvents()
 	if window.ShouldClose() {
 		running = false
 	}
+
+	// Mouse Info
+	mouseX, mouseY := window.GetCursorPos()
+	mouseMovement = mgl32.Vec2{float32(mouseX) - mousePos.X(), float32(mouseY) - mousePos.Y()}
+	mousePos = mgl32.Vec2{float32(mouseX), float32(mouseY)}
 }
 
 func KeyPressed(key int) bool {
@@ -181,3 +189,15 @@ const (
 	MouseButtonRight  int = int(glfw.MouseButtonRight)
 	MouseButtonMiddle int = int(glfw.MouseButtonMiddle)
 )
+
+var mousePos mgl32.Vec2
+
+func GetMousePos() mgl32.Vec2 {
+	return mousePos
+}
+
+var mouseMovement mgl32.Vec2
+
+func GetMouseMovement() mgl32.Vec2 {
+	return mouseMovement
+}

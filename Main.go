@@ -82,17 +82,15 @@ func runRender() {
 		startDuration = time.Since(startTime)
 
 		// All render Calls
-		updateRenderer()
-		updateWindow()
+		renderRenderer()
+		renderWindow()
 
 		var diff = time.Since(startTime) - startDuration
-
 		if diff > 0 {
 			fps = (wait / diff).Seconds() * maxFPS
 		} else {
 			fps = maxFPS
 		}
-
 		if diff < wait {
 			time.Sleep(wait - diff)
 		}
@@ -121,6 +119,12 @@ var maxUPS float64
 func SetMaxUPS(_maxUPS float64) {
 	maxUPS = _maxUPS
 }
+
+var updateDeltaTime float64
+
+func GetDeltaTime() float64 {
+	return updateDeltaTime
+}
 func runUpdate() {
 	var startTime = time.Now()
 	var startDuration time.Duration
@@ -130,19 +134,21 @@ func runUpdate() {
 		startDuration = time.Since(startTime)
 
 		// All update Calls
+		updateWindow()
 		updateAllComponents()
 		performGameUpdateFunctions()
 
 		var diff = time.Since(startTime) - startDuration
-
 		if diff > 0 {
 			ups = (wait / diff).Seconds() * maxUPS
 		} else {
 			ups = maxUPS
 		}
-
 		if diff < wait {
+			updateDeltaTime = wait.Seconds()
 			time.Sleep(wait - diff)
+		} else {
+			updateDeltaTime = diff.Seconds()
 		}
 	}
 }

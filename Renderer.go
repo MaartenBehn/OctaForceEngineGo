@@ -64,8 +64,8 @@ func setUpRenderer() {
 	gl.BindFragDataLocation(program, 0, gl.Str("outputColor\x00"))
 
 	// Global settings
-	//gl.Enable(gl.DEPTH_TEST)
-	//gl.DepthFunc(gl.LESS)
+	gl.Enable(gl.DEPTH_TEST)
+	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0, 0, 0, 0)
 }
 
@@ -75,8 +75,8 @@ func SetActiveCameraEntity(entityId int) {
 	cameraEntityId = entityId
 }
 
-func updateRenderer() {
-	gl.Clear(gl.COLOR_BUFFER_BIT)
+func renderRenderer() {
+	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 	gl.UseProgram(program)
 
 	cameraTransform := GetComponent(cameraEntityId, ComponentTransform).(Transform)
