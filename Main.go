@@ -15,14 +15,17 @@ func init() {
 	absPath = filepath.Dir(b)
 }
 
+var gameUpdateFunction func()
+
 // StartUp needs to be called in the game main function. It requires a game start function and stop function.
 // The game start function is called after StartUp but before the update calls. So do here all initial game engine setup.
 // The game stop function is called when the game stops. So do here all stuff you need to do when the game stops.
-func StartUp(gameStartUpFunc func(), gameStopFunc func()) {
+func StartUp(gameStartUpFunc func(), gameUpdateFunc func(), gameStopFunc func()) {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	runtime.LockOSThread()
 
 	// setting var values
+	gameUpdateFunction = gameUpdateFunc
 	maxFPS = 60
 	maxUPS = 30
 	running = true
@@ -33,7 +36,6 @@ func StartUp(gameStartUpFunc func(), gameStopFunc func()) {
 		log.Fatalln("failed to initialize glfw:", err)
 	}
 	defer glfw.Terminate()
-	gameUpdateFuncMap = map[int]func(){}
 
 	// internal setup calls
 	setUpWindow()
@@ -136,7 +138,7 @@ func runUpdate() {
 		// All update Calls
 		updateWindow()
 		updateAllComponents()
-		performGameUpdateFunctions()
+		gameUpdateFunction()
 
 		var diff = time.Since(startTime) - startDuration
 		if diff > 0 {
@@ -150,27 +152,5 @@ func runUpdate() {
 		} else {
 			updateDeltaTime = diff.Seconds()
 		}
-	}
-}
-
-var gameUpdateFuncMap map[int]func()
-var gameUpdateFuncCounter int
-
-// AddUpdateCallback adds the given function to a map with a random int id.
-// The given function will be called every engine update.
-// The returned int is the id of the function in the map.
-func AddUpdateCallback(newGameUpdateFunc func()) int {
-	gameUpdateFuncCounter++
-	gameUpdateFuncMap[gameUpdateFuncCounter] = newGameUpdateFunc
-	return gameUpdateFuncCounter
-}
-
-// RemoveUpdateCallback removes the function at the given int id.
-func RemoveUpdateCallback(id int) {
-	gameUpdateFuncMap[id] = nil
-}
-func performGameUpdateFunctions() {
-	for _, gameUpdateFunc := range gameUpdateFuncMap {
-		gameUpdateFunc()
 	}
 }
