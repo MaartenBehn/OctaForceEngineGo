@@ -76,9 +76,9 @@ func SetMaxFPS(_maxFPS float64) {
 	maxFPS = _maxFPS
 }
 func runRender() {
-	var startTime = time.Now()
+	startTime := time.Now()
 	var startDuration time.Duration
-	var wait = time.Duration(1.0 / maxFPS * 1000000000)
+	wait := time.Duration(1.0 / maxFPS * 1000000000)
 
 	for running {
 		startDuration = time.Since(startTime)
@@ -87,11 +87,11 @@ func runRender() {
 		renderRenderer()
 		renderWindow()
 
-		var diff = time.Since(startTime) - startDuration
+		diff := time.Since(startTime) - startDuration
 		if diff > 0 {
-			fps = (wait / diff).Seconds() * maxFPS
+			fps = (wait.Seconds() / diff.Seconds()) * maxFPS
 		} else {
-			fps = maxFPS
+			fps = 10000
 		}
 		if diff < wait {
 			time.Sleep(wait - diff)
@@ -128,9 +128,9 @@ func GetDeltaTime() float64 {
 	return updateDeltaTime
 }
 func runUpdate() {
-	var startTime = time.Now()
+	startTime := time.Now()
 	var startDuration time.Duration
-	var wait = time.Duration(1.0 / maxUPS * 1000000000)
+	wait := time.Duration(1.0 / maxUPS * 1000000000)
 
 	for running {
 		startDuration = time.Since(startTime)
@@ -140,11 +140,11 @@ func runUpdate() {
 		updateAllComponents()
 		gameUpdateFunction()
 
-		var diff = time.Since(startTime) - startDuration
+		diff := time.Since(startTime) - startDuration
 		if diff > 0 {
-			ups = (wait / diff).Seconds() * maxUPS
+			ups = (wait.Seconds() / diff.Seconds()) * maxUPS
 		} else {
-			ups = maxUPS
+			ups = 10000
 		}
 		if diff < wait {
 			updateDeltaTime = wait.Seconds()

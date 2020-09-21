@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	windowWidth  = 1920
-	windowHeight = 1080
+	windowWidth  = 1280
+	windowHeight = 720
 )
 
 var window *glfw.Window
