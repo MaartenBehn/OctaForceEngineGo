@@ -31,9 +31,9 @@ func LoadMtl(path string) []Material {
 			break
 		case "Kd":
 			materials[currentMaterial].DiffuseColor = mgl32.Vec3{
-				parseFloat(values[1]),
-				parseFloat(values[2]),
-				parseFloat(values[3])}
+				ParseFloat(values[1]),
+				ParseFloat(values[2]),
+				ParseFloat(values[3])}
 			break
 		}
 	}

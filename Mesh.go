@@ -56,13 +56,13 @@ func LoadOBJ(path string, loadMaterials bool) Mesh {
 			}
 			break
 		case "v":
-			vertices = append(vertices, mgl32.Vec3{parseFloat(values[1]), parseFloat(values[2]), parseFloat(values[3])})
+			vertices = append(vertices, mgl32.Vec3{ParseFloat(values[1]), ParseFloat(values[2]), ParseFloat(values[3])})
 			break
 		case "vn":
-			normals = append(normals, mgl32.Vec3{parseFloat(values[1]), parseFloat(values[2]), parseFloat(values[3])})
+			normals = append(normals, mgl32.Vec3{ParseFloat(values[1]), ParseFloat(values[2]), ParseFloat(values[3])})
 			break
 		case "vt":
-			uvCord = append(uvCord, mgl32.Vec2{parseFloat(values[1]), parseFloat(values[2])})
+			uvCord = append(uvCord, mgl32.Vec2{ParseFloat(values[1]), ParseFloat(values[2])})
 			break
 		case "f":
 			var face [3][3]uint32
@@ -72,9 +72,9 @@ func LoadOBJ(path string, loadMaterials bool) Mesh {
 				}
 
 				number := strings.Split(value, "/")
-				face[j-1][0] = parseInt(number[0])
-				face[j-1][1] = parseInt(number[1])
-				face[j-1][2] = parseInt(number[2])
+				face[j-1][0] = ParseInt(number[0])
+				face[j-1][1] = ParseInt(number[1])
+				face[j-1][2] = ParseInt(number[2])
 			}
 			faces = append(faces, face)
 			break
