@@ -72,9 +72,9 @@ func LoadOBJ(path string, loadMaterials bool) Mesh {
 				}
 
 				number := strings.Split(value, "/")
-				face[j-1][0] = ParseInt(number[0])
-				face[j-1][1] = ParseInt(number[1])
-				face[j-1][2] = ParseInt(number[2])
+				face[j-1][0] = uint32(ParseInt(number[0]))
+				face[j-1][1] = uint32(ParseInt(number[1]))
+				face[j-1][2] = uint32(ParseInt(number[2]))
 			}
 			faces = append(faces, face)
 			break

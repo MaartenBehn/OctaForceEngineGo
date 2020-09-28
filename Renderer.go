@@ -18,6 +18,7 @@ var (
 )
 
 func setUpRenderer() {
+
 	var err error
 	// Initialize Gl
 	if err = gl.Init(); err != nil {
