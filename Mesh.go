@@ -13,13 +13,16 @@ type Vertex struct {
 	UVCord   mgl32.Vec2
 }
 type Mesh struct {
-	Vertices          []Vertex
-	Indices           []uint32
-	NeedsRenderUpdate bool
-	vao               uint32
-	vbo               uint32
-	ebo               uint32
-	Material          Material
+	Vertices      []Vertex
+	Indices       []uint32
+	needNewBuffer bool
+	vao           uint32
+	vertexVBO     uint32
+	instanceVBO   uint32
+	ebo           uint32
+
+	Instants []int
+	Material Material
 }
 
 func setUpMesh(_ interface{}) interface{} {
@@ -95,7 +98,65 @@ func LoadOBJ(path string, loadMaterials bool) Mesh {
 		}
 	}
 
-	mesh.NeedsRenderUpdate = true
+	mesh.needNewBuffer = true
 
 	return mesh
+}
+
+type MeshInstant struct {
+	OwnEntity          int
+	MeshEntity         int
+	currentlySetEntity int
+
+	Material Material
+}
+
+func setUpMeshInstant(_ interface{}) interface{} {
+	return MeshInstant{}
+}
+
+func addMeshInstant(data interface{}) interface{} {
+	meshInstant := data.(MeshInstant)
+
+	if meshInstant.OwnEntity == 0 || meshInstant.MeshEntity == 0 {
+		return data
+	}
+
+	if meshInstant.currentlySetEntity != meshInstant.MeshEntity {
+
+		if HasComponent(meshInstant.currentlySetEntity, ComponentMesh) {
+			mesh := GetComponent(meshInstant.currentlySetEntity, ComponentMesh).(Mesh)
+			mesh.removeMeshInstantFromMesh(meshInstant)
+			SetComponent(meshInstant.currentlySetEntity, ComponentMesh, mesh)
+		}
+
+		mesh := GetComponent(meshInstant.MeshEntity, ComponentMesh).(Mesh)
+		mesh.Instants = append(mesh.Instants, meshInstant.OwnEntity)
+		mesh.needNewBuffer = true
+		SetComponent(meshInstant.MeshEntity, ComponentMesh, mesh)
+
+		meshInstant.currentlySetEntity = meshInstant.MeshEntity
+	}
+
+	return meshInstant
+}
+
+func removeMeshInstant(data interface{}) interface{} {
+	meshInstant := data.(MeshInstant)
+
+	if HasComponent(meshInstant.currentlySetEntity, ComponentMesh) {
+		mesh := GetComponent(meshInstant.currentlySetEntity, ComponentMesh).(Mesh)
+		mesh.removeMeshInstantFromMesh(meshInstant)
+		SetComponent(meshInstant.currentlySetEntity, ComponentMesh, mesh)
+	}
+
+	return meshInstant
+}
+
+func (mesh *Mesh) removeMeshInstantFromMesh(meshInstant MeshInstant) {
+	for i := len(mesh.Instants); i > 0; i-- {
+		if mesh.Instants[i] == meshInstant.currentlySetEntity {
+			mesh.Instants = append(mesh.Instants[:i], mesh.Instants[i+1:]...)
+		}
+	}
 }

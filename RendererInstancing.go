@@ -1,5 +1,6 @@
 package OctaForceEngine
 
+/*
 import (
 	"fmt"
 	"github.com/go-gl/gl/v4.1-core/gl"
@@ -95,9 +96,9 @@ func renderRenderer() {
 	deleteUnUsedVAOs()
 }
 
-const vertexStride int32 = 3 * 4
-const instanceStride int32 = 19 * 4
-
+const vboStride int32 = 3 * 4
+const transformStride int32 = 3 * 4
+const colorStride int32 = 3 * 4
 func renderEntity(entityId int) {
 	mesh := GetComponent(entityId, ComponentMesh).(Mesh)
 	transform := GetComponent(entityId, ComponentTransform).(Transform)
@@ -112,96 +113,71 @@ func renderEntity(entityId int) {
 			}...)
 		}
 
-		// VAO
+		transformData := []float32{
+			transform.position[0],
+			transform.position[1],
+			transform.position[2],
+		}
+		colorData := []float32{
+			mesh.Material.DiffuseColor[0],
+			mesh.Material.DiffuseColor[1],
+			mesh.Material.DiffuseColor[2],
+		}
+		for instanceId := range mesh.Instants {
+			instantTransform := GetComponent(instanceId, ComponentTransform).(Transform)
+			transformData = append(transformData, []float32{
+				instantTransform.position[0],
+				instantTransform.position[1],
+				instantTransform.position[2],
+			}...)
+
+			meshInstant := GetComponent(instanceId, ComponentMeshInstant).(MeshInstant)
+			colorData = append(colorData, []float32{
+				meshInstant.Material.DiffuseColor[0],
+				meshInstant.Material.DiffuseColor[1],
+				meshInstant.Material.DiffuseColor[2],
+			}...)
+		}
+
 		gl.GenVertexArrays(1, &mesh.vao)
 		gl.BindVertexArray(mesh.vao)
 
-		// Vertex VBO
 		gl.GenBuffers(1, &mesh.vertexVBO)
 		gl.BindBuffer(gl.ARRAY_BUFFER, mesh.vertexVBO)
 		gl.BufferData(gl.ARRAY_BUFFER, len(vertexData)*4, gl.Ptr(vertexData), gl.STATIC_DRAW)
-
 		vertexPositionAttrib := uint32(gl.GetAttribLocation(program, gl.Str("vertexPosition\x00")))
 		gl.EnableVertexAttribArray(vertexPositionAttrib)
-		gl.VertexAttribPointer(vertexPositionAttrib, 3, gl.FLOAT, false, vertexStride, gl.PtrOffset(0))
+		gl.VertexAttribPointer(vertexPositionAttrib, 3, gl.FLOAT, false, vboStride, gl.PtrOffset(0))
 
-		// EBO
 		gl.GenBuffers(1, &mesh.ebo)
 		gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.ebo)
 		gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(mesh.Indices)*4, gl.Ptr(mesh.Indices), gl.STATIC_DRAW)
 
-		// Instance VBO
-		gl.GenBuffers(1, &mesh.instanceVBO)
-		gl.BindBuffer(gl.ARRAY_BUFFER, mesh.instanceVBO)
-		gl.BufferData(gl.ARRAY_BUFFER, (len(mesh.Instants)+1)*int(instanceStride), gl.Ptr(nil), gl.DYNAMIC_DRAW)
+		gl.GenBuffers(1, &mesh.transformVBO)
+		gl.BindBuffer(gl.ARRAY_BUFFER, mesh.transformVBO)
+		gl.BufferData(gl.ARRAY_BUFFER, len(transformData)*4, gl.Ptr(transformData), gl.STATIC_DRAW)
+		transformAttrib := uint32(gl.GetAttribLocation(program, gl.Str("transform\x00")))
+		gl.EnableVertexAttribArray(transformAttrib)
+		gl.VertexAttribPointer(transformAttrib, 3, gl.FLOAT, false, transformStride, gl.PtrOffset(0))
+		gl.VertexAttribDivisor(mesh.transformVBO, 1)
 
-		colorAttrib := uint32(gl.GetAttribLocation(program, gl.Str("instanceColor\x00")))
+		gl.GenBuffers(1, &mesh.colorVBO)
+		gl.BindBuffer(gl.ARRAY_BUFFER, mesh.colorVBO)
+		gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(colorData)*4, gl.Ptr(colorData), gl.STATIC_DRAW)
+		colorAttrib := uint32(gl.GetAttribLocation(program, gl.Str("meshColor\x00")))
 		gl.EnableVertexAttribArray(colorAttrib)
-		gl.VertexAttribPointer(colorAttrib, 3, gl.FLOAT, false, vertexStride, gl.PtrOffset(0))
-		gl.VertexAttribDivisor(colorAttrib, 1)
-
-		transformXAttrib := uint32(gl.GetAttribLocation(program, gl.Str("transformX\x00")))
-		gl.EnableVertexAttribArray(transformXAttrib)
-		gl.VertexAttribPointer(transformXAttrib, 4, gl.FLOAT, false, instanceStride, gl.PtrOffset(3*4))
-		gl.VertexAttribDivisor(transformXAttrib, 1)
-
-		transformYAttrib := uint32(gl.GetAttribLocation(program, gl.Str("transformY\x00")))
-		gl.EnableVertexAttribArray(transformYAttrib)
-		gl.VertexAttribPointer(transformYAttrib, 4, gl.FLOAT, false, instanceStride, gl.PtrOffset(7*4))
-		gl.VertexAttribDivisor(transformYAttrib, 1)
-
-		transformZAttrib := uint32(gl.GetAttribLocation(program, gl.Str("transformZ\x00")))
-		gl.EnableVertexAttribArray(transformZAttrib)
-		gl.VertexAttribPointer(transformZAttrib, 4, gl.FLOAT, false, instanceStride, gl.PtrOffset(11*4))
-		gl.VertexAttribDivisor(transformZAttrib, 1)
-
-		transformSAttrib := uint32(gl.GetAttribLocation(program, gl.Str("transformS\x00")))
-		gl.EnableVertexAttribArray(transformSAttrib)
-		gl.VertexAttribPointer(transformSAttrib, 4, gl.FLOAT, false, instanceStride, gl.PtrOffset(15*4))
-		gl.VertexAttribDivisor(transformSAttrib, 1)
+		gl.VertexAttribPointer(colorAttrib, 3, gl.FLOAT, false, colorStride, gl.PtrOffset(0))
+		gl.VertexAttribDivisor(mesh.colorVBO, 1)
 
 		mesh.needNewBuffer = false
+
+		SetComponent(entityId, ComponentMesh, mesh)
 
 	} else {
 		gl.BindVertexArray(mesh.vao)
 	}
 
-	var instanceData = []float32{
-		mesh.Material.DiffuseColor.X(),
-		mesh.Material.DiffuseColor.Y(),
-		mesh.Material.DiffuseColor.Z(),
-
-		transform.matrix[0],
-		transform.matrix[1],
-		transform.matrix[2],
-		transform.matrix[3],
-
-		transform.matrix[4],
-		transform.matrix[5],
-		transform.matrix[6],
-		transform.matrix[7],
-
-		transform.matrix[8],
-		transform.matrix[9],
-		transform.matrix[10],
-		transform.matrix[11],
-
-		transform.matrix[12],
-		transform.matrix[13],
-		transform.matrix[14],
-		transform.matrix[15],
-	}
-
-	for i := 0; i < len(mesh.Instants); i++ {
-		instanceData = append(instanceData, []float32{}...)
-	}
-
-	gl.BindBuffer(gl.ARRAY_BUFFER, mesh.instanceVBO)
-	gl.BufferSubData(gl.ARRAY_BUFFER, 0, (len(mesh.Instants)+1)*int(instanceStride), gl.Ptr(instanceData))
-
-	SetComponent(entityId, ComponentMesh, mesh)
-
-	gl.DrawElementsInstanced(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_INT, nil, 1)
+	gl.DrawElementsInstanced(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_INT, nil, int32(len(mesh.Instants) +1))
 }
 
 var unUsedVAOs []uint32
@@ -212,3 +188,4 @@ func deleteUnUsedVAOs() {
 	}
 	unUsedVAOs = []uint32{}
 }
+*/

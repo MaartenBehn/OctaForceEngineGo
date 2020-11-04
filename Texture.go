@@ -26,7 +26,7 @@ func newTexture(file string) (Texture, error) {
 
 	rgba := image.NewRGBA(img.Bounds())
 	if rgba.Stride != rgba.Rect.Size().X*4 {
-		return Texture{}, fmt.Errorf("unsupported stride")
+		return Texture{}, fmt.Errorf("unsupported vertexStride")
 	}
 	draw.Draw(rgba, rgba.Bounds(), img, image.Point{}, draw.Src)
 
