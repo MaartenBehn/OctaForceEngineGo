@@ -167,9 +167,9 @@ func renderEntity(entityId int) {
 	}
 
 	var instanceData = []float32{
-		mesh.Material.DiffuseColor.X(),
-		mesh.Material.DiffuseColor.Y(),
-		mesh.Material.DiffuseColor.Z(),
+		mesh.Material.DiffuseColor[0],
+		mesh.Material.DiffuseColor[1],
+		mesh.Material.DiffuseColor[2],
 
 		transform.matrix[0],
 		transform.matrix[1],
@@ -192,8 +192,35 @@ func renderEntity(entityId int) {
 		transform.matrix[15],
 	}
 
-	for i := 0; i < len(mesh.Instants); i++ {
-		instanceData = append(instanceData, []float32{}...)
+	for _, id := range mesh.Instants {
+		meshInstant := GetComponent(id, ComponentMeshInstant).(MeshInstant)
+		instantTransform := GetComponent(id, ComponentTransform).(Transform)
+
+		instanceData = append(instanceData, []float32{
+			meshInstant.Material.DiffuseColor[0],
+			meshInstant.Material.DiffuseColor[1],
+			meshInstant.Material.DiffuseColor[2],
+
+			instantTransform.matrix[0],
+			instantTransform.matrix[1],
+			instantTransform.matrix[2],
+			instantTransform.matrix[3],
+
+			instantTransform.matrix[4],
+			instantTransform.matrix[5],
+			instantTransform.matrix[6],
+			instantTransform.matrix[7],
+
+			instantTransform.matrix[8],
+			instantTransform.matrix[9],
+			instantTransform.matrix[10],
+			instantTransform.matrix[11],
+
+			instantTransform.matrix[12],
+			instantTransform.matrix[13],
+			instantTransform.matrix[14],
+			instantTransform.matrix[15],
+		}...)
 	}
 
 	gl.BindBuffer(gl.ARRAY_BUFFER, mesh.instanceVBO)
@@ -201,7 +228,7 @@ func renderEntity(entityId int) {
 
 	SetComponent(entityId, ComponentMesh, mesh)
 
-	gl.DrawElementsInstanced(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_INT, nil, 1)
+	gl.DrawElementsInstanced(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_INT, nil, int32(len(mesh.Instants)+1))
 }
 
 var unUsedVAOs []uint32
