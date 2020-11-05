@@ -137,7 +137,7 @@ func renderEntity(entityId int) {
 
 		colorAttrib := uint32(gl.GetAttribLocation(program, gl.Str("instanceColor\x00")))
 		gl.EnableVertexAttribArray(colorAttrib)
-		gl.VertexAttribPointer(colorAttrib, 3, gl.FLOAT, false, vertexStride, gl.PtrOffset(0))
+		gl.VertexAttribPointer(colorAttrib, 3, gl.FLOAT, false, instanceStride, gl.PtrOffset(0))
 		gl.VertexAttribDivisor(colorAttrib, 1)
 
 		transformXAttrib := uint32(gl.GetAttribLocation(program, gl.Str("transformX\x00")))
