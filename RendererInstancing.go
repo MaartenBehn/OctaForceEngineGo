@@ -88,7 +88,7 @@ func renderRenderer() {
 
 	entities := GetAllEntitiesWithComponent(ComponentMesh)
 	for _, entity := range entities {
-		renderEntity(entity)
+		renderMesh(entity)
 	}
 
 	gl.BindVertexArray(0)
@@ -99,7 +99,7 @@ func renderRenderer() {
 const vboStride int32 = 3 * 4
 const transformStride int32 = 3 * 4
 const colorStride int32 = 3 * 4
-func renderEntity(entityId int) {
+func renderMesh(entityId int) {
 	mesh := GetComponent(entityId, ComponentMesh).(Mesh)
 	transform := GetComponent(entityId, ComponentTransform).(Transform)
 
@@ -123,7 +123,7 @@ func renderEntity(entityId int) {
 			mesh.Material.DiffuseColor[1],
 			mesh.Material.DiffuseColor[2],
 		}
-		for instanceId := range mesh.Instants {
+		for instanceId := range mesh.instants {
 			instantTransform := GetComponent(instanceId, ComponentTransform).(Transform)
 			transformData = append(transformData, []float32{
 				instantTransform.position[0],
@@ -177,7 +177,7 @@ func renderEntity(entityId int) {
 		gl.BindVertexArray(mesh.vao)
 	}
 
-	gl.DrawElementsInstanced(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_INT, nil, int32(len(mesh.Instants) +1))
+	gl.DrawElementsInstanced(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_INT, nil, int32(len(mesh.instants) +1))
 }
 
 var unUsedVAOs []uint32

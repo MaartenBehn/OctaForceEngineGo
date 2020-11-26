@@ -21,7 +21,7 @@ type Mesh struct {
 	instanceVBO   uint32
 	ebo           uint32
 
-	Instants []int
+	instants []int
 	Material Material
 }
 
@@ -131,7 +131,7 @@ func addMeshInstant(component interface{}) interface{} {
 		}
 
 		mesh := GetComponent(meshInstant.MeshEntity, ComponentMesh).(Mesh)
-		mesh.Instants = append(mesh.Instants, meshInstant.OwnEntity)
+		mesh.instants = append(mesh.instants, meshInstant.OwnEntity)
 		mesh.needNewBuffer = true
 		SetComponent(meshInstant.MeshEntity, ComponentMesh, mesh)
 
@@ -154,9 +154,9 @@ func removeMeshInstant(component interface{}) interface{} {
 }
 
 func (mesh *Mesh) removeMeshInstantFromMesh(meshInstant MeshInstant) {
-	for i := len(mesh.Instants); i > 0; i-- {
-		if mesh.Instants[i] == meshInstant.currentlySetEntity {
-			mesh.Instants = append(mesh.Instants[:i], mesh.Instants[i+1:]...)
+	for i := len(mesh.instants); i > 0; i-- {
+		if mesh.instants[i] == meshInstant.currentlySetEntity {
+			mesh.instants = append(mesh.instants[:i], mesh.instants[i+1:]...)
 		}
 	}
 }

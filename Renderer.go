@@ -87,7 +87,7 @@ func renderRenderer() {
 
 	entities := GetAllEntitiesWithComponent(ComponentMesh)
 	for _, entity := range entities {
-		renderEntity(entity)
+		renderMesh(entity)
 	}
 
 	gl.BindVertexArray(0)
@@ -98,7 +98,7 @@ func renderRenderer() {
 const vertexStride int32 = 3 * 4
 const instanceStride int32 = 19 * 4
 
-func renderEntity(entityId int) {
+func renderMesh(entityId int) {
 	mesh := GetComponent(entityId, ComponentMesh).(Mesh)
 	transform := GetComponent(entityId, ComponentTransform).(Transform)
 
@@ -133,7 +133,7 @@ func renderEntity(entityId int) {
 		// Instance VBO
 		gl.GenBuffers(1, &mesh.instanceVBO)
 		gl.BindBuffer(gl.ARRAY_BUFFER, mesh.instanceVBO)
-		gl.BufferData(gl.ARRAY_BUFFER, (len(mesh.Instants)+1)*int(instanceStride), gl.Ptr(nil), gl.DYNAMIC_DRAW)
+		gl.BufferData(gl.ARRAY_BUFFER, (len(mesh.instants)+1)*int(instanceStride), gl.Ptr(nil), gl.DYNAMIC_DRAW)
 
 		colorAttrib := uint32(gl.GetAttribLocation(program, gl.Str("instanceColor\x00")))
 		gl.EnableVertexAttribArray(colorAttrib)
@@ -192,7 +192,7 @@ func renderEntity(entityId int) {
 		transform.matrix[15],
 	}
 
-	for _, id := range mesh.Instants {
+	for _, id := range mesh.instants {
 		meshInstant := GetComponent(id, ComponentMeshInstant).(MeshInstant)
 		instantTransform := GetComponent(id, ComponentTransform).(Transform)
 
@@ -224,11 +224,11 @@ func renderEntity(entityId int) {
 	}
 
 	gl.BindBuffer(gl.ARRAY_BUFFER, mesh.instanceVBO)
-	gl.BufferSubData(gl.ARRAY_BUFFER, 0, (len(mesh.Instants)+1)*int(instanceStride), gl.Ptr(instanceData))
+	gl.BufferData(gl.ARRAY_BUFFER, (len(mesh.instants)+1)*int(instanceStride), gl.Ptr(instanceData), gl.DYNAMIC_DRAW)
 
 	SetComponent(entityId, ComponentMesh, mesh)
 
-	gl.DrawElementsInstanced(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_INT, nil, int32(len(mesh.Instants)+1))
+	gl.DrawElementsInstanced(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_INT, nil, int32(len(mesh.instants)+1))
 }
 
 var unUsedVAOs []uint32
