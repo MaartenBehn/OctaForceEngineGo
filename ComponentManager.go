@@ -16,22 +16,17 @@ const (
 	componentFuncRemove = 4
 )
 
-type component struct {
-	id   int
-	data interface{}
-}
-
-var components map[int]map[int]component
+var components map[int]map[int]interface{}
 var componentsMutex sync.Mutex
 var dependencyTable map[int][]int
-var funcTable map[int]map[int]func(data interface{}) interface{}
+var funcTable map[int]map[int]func(component interface{}) interface{}
 
 func setUpComponentTables() {
 	componentsMutex = sync.Mutex{}
 	componentsMutex.Lock()
 	defer componentsMutex.Unlock()
 
-	components = map[int]map[int]component{}
+	components = map[int]map[int]interface{}{}
 
 	dependencyTable = map[int][]int{}
 	dependencyTable[ComponentTransform] = []int{}
@@ -39,40 +34,53 @@ func setUpComponentTables() {
 	dependencyTable[ComponentMeshInstant] = []int{ComponentTransform}
 	dependencyTable[ComponentCamera] = []int{ComponentTransform}
 
-	funcTable = map[int]map[int]func(data interface{}) interface{}{}
-	funcTable[ComponentTransform] = map[int]func(data interface{}) interface{}{}
+	funcTable = map[int]map[int]func(component interface{}) interface{}{}
+	funcTable[ComponentTransform] = map[int]func(component interface{}) interface{}{}
 	funcTable[ComponentTransform][componentFuncAdd] = setUpTransform
 	funcTable[ComponentTransform][componentFuncSet] = setTransformMatrix
 
-	funcTable[ComponentMesh] = map[int]func(data interface{}) interface{}{}
+	funcTable[ComponentMesh] = map[int]func(component interface{}) interface{}{}
 	funcTable[ComponentMesh][componentFuncAdd] = setUpMesh
 	funcTable[ComponentMesh][componentFuncRemove] = deleteMesh
 
-	funcTable[ComponentMeshInstant] = map[int]func(data interface{}) interface{}{}
+	funcTable[ComponentMeshInstant] = map[int]func(component interface{}) interface{}{}
 	funcTable[ComponentMeshInstant][componentFuncAdd] = setUpMeshInstant
 	funcTable[ComponentMeshInstant][componentFuncSet] = addMeshInstant
 	funcTable[ComponentMeshInstant][componentFuncRemove] = removeMeshInstant
 
-	funcTable[ComponentCamera] = map[int]func(data interface{}) interface{}{}
+	funcTable[ComponentCamera] = map[int]func(component interface{}) interface{}{}
 	funcTable[ComponentCamera][componentFuncAdd] = setUpCamera
 }
 
 var idCounter int
+var freedIds []int
 
 // CreateEntity creates a new entity and returns its id.
 func CreateEntity() int {
-	idCounter++
+	var id int
+	if len(freedIds) > 0 {
+		id = freedIds[0]
+		freedIds = append(freedIds[:0], freedIds[1:]...)
+	} else {
+		idCounter++
+		id = idCounter
+	}
+
 	componentsMutex.Lock()
-	components[idCounter] = map[int]component{}
+	components[id] = map[int]interface{}{}
 	componentsMutex.Unlock()
-	return idCounter
+
+	return id
 }
 
 // DeleteEntity deletes the entity of the given id.
 func DeleteEntity(id int) {
+
 	componentsMutex.Lock()
-	defer componentsMutex.Unlock()
 	delete(components, id)
+	componentsMutex.Unlock()
+
+	freedIds = append(freedIds, id)
 }
 
 // HasEntity returns true if entity of id exists.
@@ -88,7 +96,7 @@ func GetAllEntitiesWithComponent(id int) []int {
 
 	componentsMutex.Lock()
 	for entityId, _ := range components {
-		if components[entityId][id].data != nil {
+		if components[entityId][id] != nil {
 			entities = append(entities, entityId)
 		}
 	}
@@ -100,10 +108,8 @@ func GetAllEntitiesWithComponent(id int) []int {
 // AddComponent adds the given component to the given entity.
 // Also adds any component the given component is dependent on, when they aren't already added.
 func AddComponent(entityId int, componentId int) interface{} {
-	component := component{
-		id:   componentId,
-		data: funcTable[componentId][componentFuncAdd](nil),
-	}
+
+	component := funcTable[componentId][componentFuncAdd](nil)
 
 	componentsMutex.Lock()
 	components[entityId][componentId] = component
@@ -114,7 +120,7 @@ func AddComponent(entityId int, componentId int) interface{} {
 			AddComponent(entityId, dependency)
 		}
 	}
-	return component.data
+	return component
 }
 
 // RemoveComponent removes given component from given entity.
@@ -127,21 +133,14 @@ func RemoveComponent(entityId int, componentId int) {
 	componentsMutex.Unlock()
 
 	if funcTable[componentId][componentFuncRemove] != nil {
-		funcTable[componentId][componentFuncRemove](component.data)
+		funcTable[componentId][componentFuncRemove](component)
 	}
 }
 
 // SetComponent sets the value of given component on given entity.
-func SetComponent(entityId int, componentId int, data interface{}) {
-
-	componentsMutex.Lock()
-	component := components[entityId][componentId]
-	componentsMutex.Unlock()
-
+func SetComponent(entityId int, componentId int, component interface{}) {
 	if funcTable[componentId][componentFuncSet] != nil {
-		component.data = funcTable[componentId][componentFuncSet](data)
-	} else {
-		component.data = data
+		component = funcTable[componentId][componentFuncSet](component)
 	}
 
 	componentsMutex.Lock()
@@ -153,7 +152,7 @@ func SetComponent(entityId int, componentId int, data interface{}) {
 func HasComponent(entityId int, componentId int) bool {
 	componentsMutex.Lock()
 	defer componentsMutex.Unlock()
-	return components[entityId][componentId].data != nil
+	return components[entityId][componentId] != nil
 }
 
 // GetComponent returns copy of the value of given component on given entity.
@@ -164,32 +163,32 @@ func GetComponent(entityId int, componentId int) interface{} {
 	componentsMutex.Unlock()
 
 	if funcTable[componentId][componentFuncGet] != nil {
-		data := funcTable[componentId][componentFuncGet](component.data)
+		newComponent := funcTable[componentId][componentFuncGet](component)
 
-		if data != component.data {
-			component.data = data
+		if newComponent != component {
+			component = newComponent
 
 			componentsMutex.Lock()
 			components[entityId][componentId] = component
 			componentsMutex.Unlock()
 		}
 	}
-	return component.data
+	return component
 }
 
 // GetAllComponentsOfId returns a slice of all copied values of components of given id.
 func GetAllComponentsOfId(id int) []interface{} {
-	var dataset []interface{}
+	var componentSet []interface{}
 
 	componentsMutex.Lock()
 	for entityId, _ := range components {
-		if components[entityId][id].data != nil {
-			dataset = append(dataset, components[entityId][id].data)
+		if components[entityId][id] != nil {
+			componentSet = append(componentSet, components[entityId][id])
 		}
 	}
 	componentsMutex.Unlock()
 
-	return dataset
+	return componentSet
 }
 
 func updateAllComponents() {
@@ -198,7 +197,7 @@ func updateAllComponents() {
 	for i, entity := range components {
 		for j, component := range entity {
 			if funcTable[j][componentFuncUpdate] != nil {
-				component.data = funcTable[j][componentFuncUpdate](component.data)
+				component = funcTable[j][componentFuncUpdate](component)
 				components[i][j] = component
 			}
 		}

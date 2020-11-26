@@ -28,8 +28,8 @@ type Mesh struct {
 func setUpMesh(_ interface{}) interface{} {
 	return Mesh{}
 }
-func deleteMesh(data interface{}) interface{} {
-	mesh := data.(Mesh)
+func deleteMesh(component interface{}) interface{} {
+	mesh := component.(Mesh)
 	unUsedVAOs = append(unUsedVAOs, mesh.vao)
 	return nil
 }
@@ -115,11 +115,11 @@ func setUpMeshInstant(_ interface{}) interface{} {
 	return MeshInstant{}
 }
 
-func addMeshInstant(data interface{}) interface{} {
-	meshInstant := data.(MeshInstant)
+func addMeshInstant(component interface{}) interface{} {
+	meshInstant := component.(MeshInstant)
 
 	if meshInstant.OwnEntity == 0 || meshInstant.MeshEntity == 0 {
-		return data
+		return component
 	}
 
 	if meshInstant.currentlySetEntity != meshInstant.MeshEntity {
@@ -141,8 +141,8 @@ func addMeshInstant(data interface{}) interface{} {
 	return meshInstant
 }
 
-func removeMeshInstant(data interface{}) interface{} {
-	meshInstant := data.(MeshInstant)
+func removeMeshInstant(component interface{}) interface{} {
+	meshInstant := component.(MeshInstant)
 
 	if HasComponent(meshInstant.currentlySetEntity, ComponentMesh) {
 		mesh := GetComponent(meshInstant.currentlySetEntity, ComponentMesh).(Mesh)

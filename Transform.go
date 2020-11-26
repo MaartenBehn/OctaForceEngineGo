@@ -20,8 +20,8 @@ func setUpTransform(_ interface{}) interface{} {
 	transform = setTransformMatrix(transform).(Transform)
 	return transform
 }
-func setTransformMatrix(data interface{}) interface{} {
-	transform := data.(Transform)
+func setTransformMatrix(component interface{}) interface{} {
+	transform := component.(Transform)
 	transform.matrix = mgl32.Translate3D(
 		transform.position.X(),
 		transform.position.Y(),
