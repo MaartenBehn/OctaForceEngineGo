@@ -1,6 +1,7 @@
 package OctaForceEngine
 
 import (
+	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
 	"io/ioutil"
 	"log"
@@ -13,20 +14,24 @@ type Vertex struct {
 	UVCord   mgl32.Vec2
 }
 type Mesh struct {
-	Vertices      []Vertex
-	Indices       []uint32
-	needNewBuffer bool
-	vao           uint32
-	vertexVBO     uint32
-	instanceVBO   uint32
-	ebo           uint32
+	Vertices    []Vertex
+	Indices     []uint32
+	vao         uint32
+	vertexVBO   uint32
+	instanceVBO uint32
+	ebo         uint32
 
 	instants []int
 	Material Material
+
+	needsMeshUpdate     bool
+	needsInstanceUpdate bool
 }
 
 func setUpMesh(_ interface{}) interface{} {
-	return Mesh{}
+	mesh := Mesh{}
+	gl.GenVertexArrays(1, &mesh.vao)
+	return mesh
 }
 func deleteMesh(component interface{}) interface{} {
 	mesh := component.(Mesh)
@@ -98,7 +103,7 @@ func LoadOBJ(path string, loadMaterials bool) Mesh {
 		}
 	}
 
-	mesh.needNewBuffer = true
+	mesh.needsMeshUpdate = true
 
 	return mesh
 }
@@ -114,7 +119,6 @@ type MeshInstant struct {
 func setUpMeshInstant(_ interface{}) interface{} {
 	return MeshInstant{}
 }
-
 func addMeshInstant(component interface{}) interface{} {
 	meshInstant := component.(MeshInstant)
 
@@ -132,7 +136,7 @@ func addMeshInstant(component interface{}) interface{} {
 
 		mesh := GetComponent(meshInstant.MeshEntity, ComponentMesh).(Mesh)
 		mesh.instants = append(mesh.instants, meshInstant.OwnEntity)
-		mesh.needNewBuffer = true
+		mesh.needsInstanceUpdate = true
 		SetComponent(meshInstant.MeshEntity, ComponentMesh, mesh)
 
 		meshInstant.currentlySetEntity = meshInstant.MeshEntity

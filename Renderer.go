@@ -70,7 +70,9 @@ func setUpRenderer() {
 // SetActiveCameraEntity sets the given entity as the camera. The given entity must have a camera component.
 // This function does not check that, so be careful.
 func SetActiveCameraEntity(entityId int) {
-	cameraEntityId = entityId
+	if HasComponent(entityId, ComponentCamera) {
+		cameraEntityId = entityId
+	}
 }
 
 func renderRenderer() {
@@ -102,7 +104,8 @@ func renderMesh(entityId int) {
 	mesh := GetComponent(entityId, ComponentMesh).(Mesh)
 	transform := GetComponent(entityId, ComponentTransform).(Transform)
 
-	if mesh.needNewBuffer {
+	gl.BindVertexArray(mesh.vao)
+	if mesh.needsMeshUpdate {
 		var vertexData []float32
 		for _, vertex := range mesh.Vertices {
 			vertexData = append(vertexData, []float32{
@@ -111,10 +114,6 @@ func renderMesh(entityId int) {
 				vertex.Position.Z(),
 			}...)
 		}
-
-		// VAO
-		gl.GenVertexArrays(1, &mesh.vao)
-		gl.BindVertexArray(mesh.vao)
 
 		// Vertex VBO
 		gl.GenBuffers(1, &mesh.vertexVBO)
@@ -130,105 +129,110 @@ func renderMesh(entityId int) {
 		gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.ebo)
 		gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(mesh.Indices)*4, gl.Ptr(mesh.Indices), gl.STATIC_DRAW)
 
-		// Instance VBO
-		gl.GenBuffers(1, &mesh.instanceVBO)
+		mesh.needsMeshUpdate = false
+	}
+
+	if len(mesh.instants) > 0 {
+		if mesh.needsInstanceUpdate {
+			// Instance VBO
+			gl.GenBuffers(1, &mesh.instanceVBO)
+			gl.BindBuffer(gl.ARRAY_BUFFER, mesh.instanceVBO)
+			gl.BufferData(gl.ARRAY_BUFFER, (len(mesh.instants)+1)*int(instanceStride), gl.Ptr(nil), gl.DYNAMIC_DRAW)
+
+			colorAttrib := uint32(gl.GetAttribLocation(program, gl.Str("instanceColor\x00")))
+			gl.EnableVertexAttribArray(colorAttrib)
+			gl.VertexAttribPointer(colorAttrib, 3, gl.FLOAT, false, instanceStride, gl.PtrOffset(0))
+			gl.VertexAttribDivisor(colorAttrib, 1)
+
+			transformXAttrib := uint32(gl.GetAttribLocation(program, gl.Str("transformX\x00")))
+			gl.EnableVertexAttribArray(transformXAttrib)
+			gl.VertexAttribPointer(transformXAttrib, 4, gl.FLOAT, false, instanceStride, gl.PtrOffset(3*4))
+			gl.VertexAttribDivisor(transformXAttrib, 1)
+
+			transformYAttrib := uint32(gl.GetAttribLocation(program, gl.Str("transformY\x00")))
+			gl.EnableVertexAttribArray(transformYAttrib)
+			gl.VertexAttribPointer(transformYAttrib, 4, gl.FLOAT, false, instanceStride, gl.PtrOffset(7*4))
+			gl.VertexAttribDivisor(transformYAttrib, 1)
+
+			transformZAttrib := uint32(gl.GetAttribLocation(program, gl.Str("transformZ\x00")))
+			gl.EnableVertexAttribArray(transformZAttrib)
+			gl.VertexAttribPointer(transformZAttrib, 4, gl.FLOAT, false, instanceStride, gl.PtrOffset(11*4))
+			gl.VertexAttribDivisor(transformZAttrib, 1)
+
+			transformSAttrib := uint32(gl.GetAttribLocation(program, gl.Str("transformS\x00")))
+			gl.EnableVertexAttribArray(transformSAttrib)
+			gl.VertexAttribPointer(transformSAttrib, 4, gl.FLOAT, false, instanceStride, gl.PtrOffset(15*4))
+			gl.VertexAttribDivisor(transformSAttrib, 1)
+
+			mesh.needsInstanceUpdate = false
+		}
+
+		// Set Instance Data
+		var instanceData = []float32{
+			mesh.Material.DiffuseColor[0],
+			mesh.Material.DiffuseColor[1],
+			mesh.Material.DiffuseColor[2],
+
+			transform.matrix[0],
+			transform.matrix[1],
+			transform.matrix[2],
+			transform.matrix[3],
+
+			transform.matrix[4],
+			transform.matrix[5],
+			transform.matrix[6],
+			transform.matrix[7],
+
+			transform.matrix[8],
+			transform.matrix[9],
+			transform.matrix[10],
+			transform.matrix[11],
+
+			transform.matrix[12],
+			transform.matrix[13],
+			transform.matrix[14],
+			transform.matrix[15],
+		}
+		for _, id := range mesh.instants {
+			meshInstant := GetComponent(id, ComponentMeshInstant).(MeshInstant)
+			instantTransform := GetComponent(id, ComponentTransform).(Transform)
+
+			instanceData = append(instanceData, []float32{
+				meshInstant.Material.DiffuseColor[0],
+				meshInstant.Material.DiffuseColor[1],
+				meshInstant.Material.DiffuseColor[2],
+
+				instantTransform.matrix[0],
+				instantTransform.matrix[1],
+				instantTransform.matrix[2],
+				instantTransform.matrix[3],
+
+				instantTransform.matrix[4],
+				instantTransform.matrix[5],
+				instantTransform.matrix[6],
+				instantTransform.matrix[7],
+
+				instantTransform.matrix[8],
+				instantTransform.matrix[9],
+				instantTransform.matrix[10],
+				instantTransform.matrix[11],
+
+				instantTransform.matrix[12],
+				instantTransform.matrix[13],
+				instantTransform.matrix[14],
+				instantTransform.matrix[15],
+			}...)
+		}
+
 		gl.BindBuffer(gl.ARRAY_BUFFER, mesh.instanceVBO)
-		gl.BufferData(gl.ARRAY_BUFFER, (len(mesh.instants)+1)*int(instanceStride), gl.Ptr(nil), gl.DYNAMIC_DRAW)
+		gl.BufferData(gl.ARRAY_BUFFER, (len(mesh.instants)+1)*int(instanceStride), gl.Ptr(instanceData), gl.DYNAMIC_DRAW)
 
-		colorAttrib := uint32(gl.GetAttribLocation(program, gl.Str("instanceColor\x00")))
-		gl.EnableVertexAttribArray(colorAttrib)
-		gl.VertexAttribPointer(colorAttrib, 3, gl.FLOAT, false, instanceStride, gl.PtrOffset(0))
-		gl.VertexAttribDivisor(colorAttrib, 1)
-
-		transformXAttrib := uint32(gl.GetAttribLocation(program, gl.Str("transformX\x00")))
-		gl.EnableVertexAttribArray(transformXAttrib)
-		gl.VertexAttribPointer(transformXAttrib, 4, gl.FLOAT, false, instanceStride, gl.PtrOffset(3*4))
-		gl.VertexAttribDivisor(transformXAttrib, 1)
-
-		transformYAttrib := uint32(gl.GetAttribLocation(program, gl.Str("transformY\x00")))
-		gl.EnableVertexAttribArray(transformYAttrib)
-		gl.VertexAttribPointer(transformYAttrib, 4, gl.FLOAT, false, instanceStride, gl.PtrOffset(7*4))
-		gl.VertexAttribDivisor(transformYAttrib, 1)
-
-		transformZAttrib := uint32(gl.GetAttribLocation(program, gl.Str("transformZ\x00")))
-		gl.EnableVertexAttribArray(transformZAttrib)
-		gl.VertexAttribPointer(transformZAttrib, 4, gl.FLOAT, false, instanceStride, gl.PtrOffset(11*4))
-		gl.VertexAttribDivisor(transformZAttrib, 1)
-
-		transformSAttrib := uint32(gl.GetAttribLocation(program, gl.Str("transformS\x00")))
-		gl.EnableVertexAttribArray(transformSAttrib)
-		gl.VertexAttribPointer(transformSAttrib, 4, gl.FLOAT, false, instanceStride, gl.PtrOffset(15*4))
-		gl.VertexAttribDivisor(transformSAttrib, 1)
-
-		mesh.needNewBuffer = false
-
+		gl.DrawElementsInstanced(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_INT, nil, int32(len(mesh.instants)+1))
 	} else {
-		gl.BindVertexArray(mesh.vao)
+
 	}
-
-	var instanceData = []float32{
-		mesh.Material.DiffuseColor[0],
-		mesh.Material.DiffuseColor[1],
-		mesh.Material.DiffuseColor[2],
-
-		transform.matrix[0],
-		transform.matrix[1],
-		transform.matrix[2],
-		transform.matrix[3],
-
-		transform.matrix[4],
-		transform.matrix[5],
-		transform.matrix[6],
-		transform.matrix[7],
-
-		transform.matrix[8],
-		transform.matrix[9],
-		transform.matrix[10],
-		transform.matrix[11],
-
-		transform.matrix[12],
-		transform.matrix[13],
-		transform.matrix[14],
-		transform.matrix[15],
-	}
-
-	for _, id := range mesh.instants {
-		meshInstant := GetComponent(id, ComponentMeshInstant).(MeshInstant)
-		instantTransform := GetComponent(id, ComponentTransform).(Transform)
-
-		instanceData = append(instanceData, []float32{
-			meshInstant.Material.DiffuseColor[0],
-			meshInstant.Material.DiffuseColor[1],
-			meshInstant.Material.DiffuseColor[2],
-
-			instantTransform.matrix[0],
-			instantTransform.matrix[1],
-			instantTransform.matrix[2],
-			instantTransform.matrix[3],
-
-			instantTransform.matrix[4],
-			instantTransform.matrix[5],
-			instantTransform.matrix[6],
-			instantTransform.matrix[7],
-
-			instantTransform.matrix[8],
-			instantTransform.matrix[9],
-			instantTransform.matrix[10],
-			instantTransform.matrix[11],
-
-			instantTransform.matrix[12],
-			instantTransform.matrix[13],
-			instantTransform.matrix[14],
-			instantTransform.matrix[15],
-		}...)
-	}
-
-	gl.BindBuffer(gl.ARRAY_BUFFER, mesh.instanceVBO)
-	gl.BufferData(gl.ARRAY_BUFFER, (len(mesh.instants)+1)*int(instanceStride), gl.Ptr(instanceData), gl.DYNAMIC_DRAW)
-
 	SetComponent(entityId, ComponentMesh, mesh)
 
-	gl.DrawElementsInstanced(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_INT, nil, int32(len(mesh.instants)+1))
 }
 
 var unUsedVAOs []uint32

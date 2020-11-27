@@ -1,7 +1,6 @@
 #version 330
 uniform mat4 projection;
 uniform mat4 camera;
-
 in vec3 vertexPosition;
 
 in vec3 instanceColor;
