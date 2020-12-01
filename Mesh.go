@@ -15,18 +15,13 @@ type Vertex struct {
 	UVCord   mgl32.Vec2
 }
 type Mesh struct {
-	Vertices    []Vertex
-	Indices     []uint32
-	vao         uint32
-	vertexVBO   uint32
-	instanceVBO uint32
-	ebo         uint32
-
-	instants []int
-	Material Material
-
-	needsMeshUpdate     bool
-	needsInstanceUpdate bool
+	Vertices        []Vertex
+	Indices         []uint32
+	vao             uint32
+	vbo             uint32
+	ebo             uint32
+	Material        Material
+	needsMeshUpdate bool
 }
 
 func setUpMesh(_ interface{}) interface{} {
@@ -110,7 +105,57 @@ func LoadOBJ(path string, loadMaterials bool) Mesh {
 }
 
 func setUpMeshVAO(entityId int) {
-	mesh := GetComponent(entityId, ComponentMesh).(Mesh)
+
+	if mesh.needsMeshUpdate {
+
+		mesh := GetComponent(entityId, ComponentMesh).(Mesh)
+
+		gl.BindVertexArray(mesh.vao)
+
+		var vertexData []float32
+		for _, vertex := range mesh.Vertices {
+			vertexData = append(vertexData, []float32{
+				vertex.Position.X(),
+				vertex.Position.Y(),
+				vertex.Position.Z(),
+			}...)
+		}
+
+		// Vertex VBO
+		gl.GenBuffers(1, &mesh.vbo)
+		gl.BindBuffer(gl.ARRAY_BUFFER, mesh.vbo)
+		gl.BufferData(gl.ARRAY_BUFFER, len(vertexData)*4, gl.Ptr(vertexData), gl.STATIC_DRAW)
+
+		vertexPositionAttrib := uint32(gl.GetAttribLocation(program, gl.Str("vertexPosition\x00")))
+		gl.EnableVertexAttribArray(vertexPositionAttrib)
+		gl.VertexAttribPointer(vertexPositionAttrib, 3, gl.FLOAT, false, vertexStride, gl.PtrOffset(0))
+
+		// EBO
+		gl.GenBuffers(1, &mesh.ebo)
+		gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.ebo)
+		gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(mesh.Indices)*4, gl.Ptr(mesh.Indices), gl.STATIC_DRAW)
+
+		mesh.needsMeshUpdate = false
+
+		SetComponent(entityId, ComponentMesh, mesh)
+	}
+}
+
+type MeshInstantRoot struct {
+	Vertices            []Vertex
+	Indices             []uint32
+	vao                 uint32
+	vertexVBO           uint32
+	instanceVBO         uint32
+	ebo                 uint32
+	instances           []int
+	Material            Material
+	needsMeshUpdate     bool
+	needsInstanceUpdate bool
+}
+
+func setUpMeshIstantRootVAO(entityId int) {
+	mesh := GetComponent(entityId, ComponentMeshInstantRoot).(MeshInstantRoot)
 	transform := GetComponent(entityId, ComponentTransform).(Transform)
 
 	gl.BindVertexArray(mesh.vao)
@@ -141,12 +186,12 @@ func setUpMeshVAO(entityId int) {
 		mesh.needsMeshUpdate = false
 	}
 
-	if len(mesh.instants) > 0 {
+	if len(mesh.instances) > 0 {
 		if mesh.needsInstanceUpdate {
 			// Instance VBO
 			gl.GenBuffers(1, &mesh.instanceVBO)
 			gl.BindBuffer(gl.ARRAY_BUFFER, mesh.instanceVBO)
-			gl.BufferData(gl.ARRAY_BUFFER, (len(mesh.instants)+1)*int(instanceStride), gl.Ptr(nil), gl.DYNAMIC_DRAW)
+			gl.BufferData(gl.ARRAY_BUFFER, (len(mesh.instances)+1)*int(instanceStride), gl.Ptr(nil), gl.DYNAMIC_DRAW)
 
 			colorAttrib := uint32(gl.GetAttribLocation(program, gl.Str("instanceColor\x00")))
 			gl.EnableVertexAttribArray(colorAttrib)
@@ -202,7 +247,7 @@ func setUpMeshVAO(entityId int) {
 			transform.matrix[14],
 			transform.matrix[15],
 		}
-		for _, id := range mesh.instants {
+		for _, id := range mesh.instances {
 			meshInstant := GetComponent(id, ComponentMeshInstant).(MeshInstant)
 			instantTransform := GetComponent(id, ComponentTransform).(Transform)
 
@@ -234,7 +279,7 @@ func setUpMeshVAO(entityId int) {
 		}
 
 		gl.BindBuffer(gl.ARRAY_BUFFER, mesh.instanceVBO)
-		gl.BufferData(gl.ARRAY_BUFFER, (len(mesh.instants)+1)*int(instanceStride), gl.Ptr(instanceData), gl.DYNAMIC_DRAW)
+		gl.BufferData(gl.ARRAY_BUFFER, (len(mesh.instances)+1)*int(instanceStride), gl.Ptr(instanceData), gl.DYNAMIC_DRAW)
 	}
 	SetComponent(entityId, ComponentMesh, mesh)
 }

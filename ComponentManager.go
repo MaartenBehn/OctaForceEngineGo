@@ -3,10 +3,11 @@ package OctaForceEngine
 import "sync"
 
 const (
-	ComponentTransform   = 1
-	ComponentMesh        = 2
-	ComponentMeshInstant = 3
-	ComponentCamera      = 4
+	ComponentTransform       = 1
+	ComponentMesh            = 2
+	ComponentMeshInstantRoot = 3
+	ComponentMeshInstant     = 4
+	ComponentCamera          = 5
 )
 const (
 	componentFuncAdd    = 0
