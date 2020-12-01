@@ -1,21 +1,14 @@
 #version 330
 uniform mat4 projection;
 uniform mat4 camera;
+uniform mat4 transform;
+uniform vec3 inColor;
+
 in vec3 vertexPosition;
 
-in vec3 instanceColor;
-in vec4 transformX;
-in vec4 transformY;
-in vec4 transformZ;
-in vec4 transformS;
-
-out vec3 color;
+out vec3 outColor;
 
 void main() {
-    color = instanceColor;
-    gl_Position =
-        projection *
-        camera *
-        mat4(transformX, transformY, transformZ, transformS) *
-        vec4(vertexPosition, 1);
+    outColor = inColor;
+    gl_Position = projection * camera * transform * vec4(vertexPosition, 1);
 }
