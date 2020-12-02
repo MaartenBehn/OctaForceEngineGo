@@ -7,9 +7,9 @@ layout(location = 3) uniform vec3 inColor;
 
 layout(location = 0) in vec3 vertexPosition;
 
-out vec3 outColor;
+out vec3 color;
 
 void main() {
-    outColor = inColor;
+    color = inColor;
     gl_Position = projection * camera * transform * vec4(vertexPosition, 1);
 }

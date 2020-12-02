@@ -140,7 +140,6 @@ func runUpdate() {
 		updateWindow()
 		updateAllComponents()
 		gameUpdateFunction()
-		printGlErrors("Update")
 
 		diff := time.Since(startTime) - startDuration
 		if diff > 0 {

@@ -10,10 +10,10 @@ layout(location = 3) in vec4 transformY;
 layout(location = 4) in vec4 transformZ;
 layout(location = 5) in vec4 transformS;
 
-out vec3 outColor;
+out vec3 color;
 
 void main() {
-    outColor = instanceColor;
+    color = instanceColor;
     gl_Position =
         projection *
         camera *

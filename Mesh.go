@@ -27,8 +27,7 @@ type Mesh struct {
 
 func setUpMesh(_ interface{}) interface{} {
 	mesh := Mesh{}
-
-	printGlErrors("Mesh VAO")
+	gl.GenVertexArrays(1, &mesh.vao)
 	return mesh
 }
 func deleteMesh(component interface{}) interface{} {
@@ -41,6 +40,7 @@ func renderMesh(entityId int) {
 
 	mesh := GetComponent(entityId, ComponentMesh).(Mesh)
 
+	gl.BindVertexArray(mesh.vao)
 	if mesh.needsMeshUpdate {
 
 		var vertexData []float32
@@ -51,8 +51,6 @@ func renderMesh(entityId int) {
 				vertex.Position.Z(),
 			}...)
 		}
-		gl.GenVertexArrays(1, &mesh.vao)
-		gl.BindVertexArray(mesh.vao)
 
 		// Vertex VBO
 		gl.GenBuffers(1, &mesh.vbo)
@@ -71,8 +69,6 @@ func renderMesh(entityId int) {
 		printGlErrors("Mesh SetUp")
 
 		SetComponent(entityId, ComponentMesh, mesh)
-	} else {
-		gl.BindVertexArray(mesh.vao)
 	}
 
 	transform := GetComponent(entityId, ComponentTransform).(Transform)
@@ -83,6 +79,12 @@ func renderMesh(entityId int) {
 
 	gl.DrawElements(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_INT, nil)
 	printGlErrors("Mesh Render")
+}
+func renderAllMeshs() {
+	entities := GetAllEntitiesWithComponent(ComponentMesh)
+	for _, entity := range entities {
+		renderMesh(entity)
+	}
 }
 
 // LoadOBJ returns the mesh struct of the given OBJ file.
@@ -166,7 +168,7 @@ type MeshInstantRoot struct {
 
 func setUpMeshInstanceRoot(_ interface{}) interface{} {
 	meshInstantRoot := MeshInstantRoot{}
-	//gl.GenVertexArrays(1, &meshInstantRoot.vao)
+	gl.GenVertexArrays(1, &meshInstantRoot.vao)
 	printGlErrors("Mesh Instance VAO")
 	return meshInstantRoot
 }
@@ -176,7 +178,7 @@ func deleteMeshInstanceRoot(component interface{}) interface{} {
 	return nil
 }
 
-func renderMeshIstantRoot(entityId int) {
+func renderMeshInstantRoot(entityId int) {
 	meshInstantRoot := GetComponent(entityId, ComponentMeshInstantRoot).(MeshInstantRoot)
 	transform := GetComponent(entityId, ComponentTransform).(Transform)
 	gl.BindVertexArray(meshInstantRoot.vao)
@@ -299,6 +301,12 @@ func renderMeshIstantRoot(entityId int) {
 	SetComponent(entityId, ComponentMeshInstantRoot, meshInstantRoot)
 
 	gl.DrawElementsInstanced(gl.TRIANGLES, int32(len(meshInstantRoot.Indices)), gl.UNSIGNED_INT, nil, int32(len(meshInstantRoot.instances)+1))
+}
+func renderAllMeshInstantRoots() {
+	entities := GetAllEntitiesWithComponent(ComponentMeshInstantRoot)
+	for _, entity := range entities {
+		renderMeshInstantRoot(entity)
+	}
 }
 
 // LoadOBJ returns the mesh struct of the given OBJ file.

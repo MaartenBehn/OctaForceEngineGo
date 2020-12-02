@@ -18,6 +18,7 @@ type ProgrammData struct {
 	vertexPath   string
 	fragmentPath string
 	id           uint32
+	renderFunc   func()
 }
 
 var programmDatas []ProgrammData
@@ -39,12 +40,12 @@ func setUpRenderer() {
 	programmDatas[0] = ProgrammData{
 		vertexPath:   "\\shader\\vertexShader.shader",
 		fragmentPath: "\\shader\\fragmentShader.shader",
-		id:           0,
+		renderFunc:   renderAllMeshs,
 	}
 	programmDatas[1] = ProgrammData{
 		vertexPath:   "\\shader\\vertexShaderInstancing.shader",
 		fragmentPath: "\\shader\\fragmentShader.shader",
-		id:           0,
+		renderFunc:   renderAllMeshInstantRoots,
 	}
 
 	for i, programmData := range programmDatas {
@@ -102,41 +103,24 @@ func SetActiveCameraEntity(entityId int) {
 func renderRenderer() {
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-	// Mesh
+	for _, programmData := range programmDatas {
+		gl.UseProgram(programmData.id)
 
-	gl.UseProgram(programmDatas[0].id)
-	pushCameraUniform()
+		cameraTransform := GetComponent(cameraEntityId, ComponentTransform).(Transform)
+		// Creating inverted Camera pos
+		view := cameraTransform.matrix.Inv()
+		gl.UniformMatrix4fv(1, 1, false, &view[0])
 
-	entities := GetAllEntitiesWithComponent(ComponentMesh)
-	for _, entity := range entities {
-		renderMesh(entity)
+		camera := GetComponent(cameraEntityId, ComponentCamera).(Camera)
+		gl.UniformMatrix4fv(0, 1, false, &camera.projection[0])
+
+		programmData.renderFunc()
 	}
-
-	/*
-		// Mesh Instancing
-		gl.UseProgram(programmDatas[1].id)
-		pushCameraUniform()
-
-		entities := GetAllEntitiesWithComponent(ComponentMeshInstantRoot)
-		for _, entity := range entities {
-			renderMeshIstantRoot(entity)
-		}
-	*/
 
 	gl.BindVertexArray(0)
 	deleteUnUsedVAOs()
 
 	printGlErrors("RenderLoop")
-}
-
-func pushCameraUniform() {
-	cameraTransform := GetComponent(cameraEntityId, ComponentTransform).(Transform)
-	// Creating inverted Camera pos
-	view := cameraTransform.matrix.Inv()
-	gl.UniformMatrix4fv(1, 1, false, &view[0])
-
-	camera := GetComponent(cameraEntityId, ComponentCamera).(Camera)
-	gl.UniformMatrix4fv(0, 1, false, &camera.projection[0])
 }
 
 const vertexStride int32 = 3 * 4
