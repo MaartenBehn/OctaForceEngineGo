@@ -19,10 +19,14 @@ type Mesh struct {
 	Vertices        []Vertex
 	Indices         []uint32
 	vao             uint32
-	vbo             uint32
+	vertexVBO       uint32
 	ebo             uint32
 	Material        Material
 	needsMeshUpdate bool
+
+	instanceVBO         uint32
+	instances           []int
+	needsInstanceUpdate bool
 }
 
 func setUpMesh(_ interface{}) interface{} {
@@ -36,55 +40,54 @@ func deleteMesh(component interface{}) interface{} {
 	return nil
 }
 
-func renderMesh(entityId int) {
+func renderMeshs() {
+	entities := GetAllEntitiesWithComponent(ComponentMesh)
+	for _, entityId := range entities {
 
-	mesh := GetComponent(entityId, ComponentMesh).(Mesh)
+		mesh := GetComponent(entityId, ComponentMesh).(Mesh)
+		gl.BindVertexArray(mesh.vao)
 
-	gl.BindVertexArray(mesh.vao)
-	if mesh.needsMeshUpdate {
-
-		var vertexData []float32
-		for _, vertex := range mesh.Vertices {
-			vertexData = append(vertexData, []float32{
-				vertex.Position.X(),
-				vertex.Position.Y(),
-				vertex.Position.Z(),
-			}...)
+		if mesh.needsMeshUpdate {
+			pushVertexData(mesh)
+			SetComponent(entityId, ComponentMesh, mesh)
 		}
 
-		// Vertex VBO
-		gl.GenBuffers(1, &mesh.vbo)
-		gl.BindBuffer(gl.ARRAY_BUFFER, mesh.vbo)
-		gl.BufferData(gl.ARRAY_BUFFER, len(vertexData)*4, gl.Ptr(vertexData), gl.STATIC_DRAW)
+		transform := GetComponent(entityId, ComponentTransform).(Transform)
+		gl.UniformMatrix4fv(2, 1, false, &transform.matrix[0])
 
-		gl.EnableVertexAttribArray(0)
-		gl.VertexAttribPointer(0, 3, gl.FLOAT, false, vertexStride, gl.PtrOffset(0))
+		// Color
+		gl.Uniform3f(3, mesh.Material.DiffuseColor[0], mesh.Material.DiffuseColor[1], mesh.Material.DiffuseColor[2])
 
-		// EBO
-		gl.GenBuffers(1, &mesh.ebo)
-		gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.ebo)
-		gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(mesh.Indices)*4, gl.Ptr(mesh.Indices), gl.STATIC_DRAW)
+		gl.DrawElements(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_INT, nil)
+		printGlErrors("Mesh Render")
 
-		mesh.needsMeshUpdate = false
-		printGlErrors("Mesh SetUp")
-
-		SetComponent(entityId, ComponentMesh, mesh)
 	}
-
-	transform := GetComponent(entityId, ComponentTransform).(Transform)
-	gl.UniformMatrix4fv(2, 1, false, &transform.matrix[0])
-
-	// Color
-	gl.Uniform3f(3, mesh.Material.DiffuseColor[0], mesh.Material.DiffuseColor[1], mesh.Material.DiffuseColor[2])
-
-	gl.DrawElements(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_INT, nil)
-	printGlErrors("Mesh Render")
 }
-func renderAllMeshs() {
-	entities := GetAllEntitiesWithComponent(ComponentMesh)
-	for _, entity := range entities {
-		renderMesh(entity)
+func pushVertexData(mesh Mesh) {
+	var vertexData []float32
+	for _, vertex := range mesh.Vertices {
+		vertexData = append(vertexData, []float32{
+			vertex.Position.X(),
+			vertex.Position.Y(),
+			vertex.Position.Z(),
+		}...)
 	}
+
+	// Vertex VBO
+	gl.GenBuffers(1, &mesh.vertexVBO)
+	gl.BindBuffer(gl.ARRAY_BUFFER, mesh.vertexVBO)
+	gl.BufferData(gl.ARRAY_BUFFER, len(vertexData)*4, gl.Ptr(vertexData), gl.STATIC_DRAW)
+
+	gl.EnableVertexAttribArray(0)
+	gl.VertexAttribPointer(0, 3, gl.FLOAT, false, vertexStride, gl.PtrOffset(0))
+
+	// EBO
+	gl.GenBuffers(1, &mesh.ebo)
+	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.ebo)
+	gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(mesh.Indices)*4, gl.Ptr(mesh.Indices), gl.STATIC_DRAW)
+
+	mesh.needsMeshUpdate = false
+	printGlErrors("Vertex SetUp")
 }
 
 // LoadOBJ returns the mesh struct of the given OBJ file.
@@ -302,7 +305,7 @@ func renderMeshInstantRoot(entityId int) {
 
 	gl.DrawElementsInstanced(gl.TRIANGLES, int32(len(meshInstantRoot.Indices)), gl.UNSIGNED_INT, nil, int32(len(meshInstantRoot.instances)+1))
 }
-func renderAllMeshInstantRoots() {
+func renderAllMeshInstants() {
 	entities := GetAllEntitiesWithComponent(ComponentMeshInstantRoot)
 	for _, entity := range entities {
 		renderMeshInstantRoot(entity)

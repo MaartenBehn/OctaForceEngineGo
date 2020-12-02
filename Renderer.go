@@ -40,12 +40,12 @@ func setUpRenderer() {
 	programmDatas[0] = ProgrammData{
 		vertexPath:   "\\shader\\vertexShader.shader",
 		fragmentPath: "\\shader\\fragmentShader.shader",
-		renderFunc:   renderAllMeshs,
+		renderFunc:   renderMeshs,
 	}
 	programmDatas[1] = ProgrammData{
 		vertexPath:   "\\shader\\vertexShaderInstancing.shader",
 		fragmentPath: "\\shader\\fragmentShader.shader",
-		renderFunc:   renderAllMeshInstantRoots,
+		renderFunc:   renderAllMeshInstants,
 	}
 
 	for i, programmData := range programmDatas {
