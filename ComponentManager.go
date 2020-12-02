@@ -3,11 +3,10 @@ package OctaForceEngine
 import "sync"
 
 const (
-	ComponentTransform       = 1
-	ComponentMesh            = 2
-	ComponentMeshInstantRoot = 3
-	ComponentMeshInstant     = 4
-	ComponentCamera          = 5
+	ComponentTransform   = 1
+	ComponentMesh        = 2
+	ComponentMeshInstant = 4
+	ComponentCamera      = 5
 )
 const (
 	componentFuncAdd    = 0
@@ -32,7 +31,6 @@ func setUpComponentTables() {
 	dependencyTable = map[int][]int{}
 	dependencyTable[ComponentTransform] = []int{}
 	dependencyTable[ComponentMesh] = []int{ComponentTransform}
-	dependencyTable[ComponentMeshInstantRoot] = []int{ComponentTransform}
 	dependencyTable[ComponentMeshInstant] = []int{ComponentTransform}
 	dependencyTable[ComponentCamera] = []int{ComponentTransform}
 
@@ -44,10 +42,6 @@ func setUpComponentTables() {
 	funcTable[ComponentMesh] = map[int]func(component interface{}) interface{}{}
 	funcTable[ComponentMesh][componentFuncAdd] = setUpMesh
 	funcTable[ComponentMesh][componentFuncRemove] = deleteMesh
-
-	funcTable[ComponentMeshInstantRoot] = map[int]func(component interface{}) interface{}{}
-	funcTable[ComponentMeshInstantRoot][componentFuncAdd] = setUpMeshInstanceRoot
-	funcTable[ComponentMeshInstantRoot][componentFuncRemove] = deleteMeshInstanceRoot
 
 	funcTable[ComponentMeshInstant] = map[int]func(component interface{}) interface{}{}
 	funcTable[ComponentMeshInstant][componentFuncAdd] = setUpMeshInstant
