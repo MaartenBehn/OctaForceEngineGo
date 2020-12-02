@@ -1,13 +1,14 @@
-#version 330
-uniform mat4 projection;
-uniform mat4 camera;
-in vec3 vertexPosition;
+#version 430
 
-in vec3 instanceColor;
-in vec4 transformX;
-in vec4 transformY;
-in vec4 transformZ;
-in vec4 transformS;
+layout(location = 0) uniform mat4 projection;
+layout(location = 1) uniform mat4 camera;
+
+layout(location = 0) in vec3 vertexPosition;
+layout(location = 1) in vec3 instanceColor;
+layout(location = 2) in vec4 transformX;
+layout(location = 3) in vec4 transformY;
+layout(location = 4) in vec4 transformZ;
+layout(location = 5) in vec4 transformS;
 
 out vec3 outColor;
 

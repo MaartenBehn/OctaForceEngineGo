@@ -1,4 +1,5 @@
-#version 330
+#version 430
+
 in vec3 color;
 out vec4 outputColor;
 

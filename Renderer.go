@@ -4,22 +4,20 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/go-gl/gl/v4.1-core/gl"
+	"github.com/go-gl/gl/v4.6-core/gl"
 )
 
 var (
 	version string
 	program uint32
 
-	cameraEntityId         int
-	cameraTransformUniform int32
-	projectionUniform      int32
+	cameraEntityId int
 )
 
 type ProgrammData struct {
 	vertexPath   string
 	fragmentPath string
-	id           int
+	id           uint32
 }
 
 var programmDatas []ProgrammData
@@ -33,6 +31,21 @@ func setUpRenderer() {
 	}
 	version = gl.GoStr(gl.GetString(gl.VERSION))
 	fmt.Println("OpenGL version", version)
+
+	gl.Enable(gl.DEBUG_OUTPUT)
+	gl.DebugMessageCallback(nil, nil)
+
+	programmDatas = make([]ProgrammData, 2)
+	programmDatas[0] = ProgrammData{
+		vertexPath:   "\\shader\\vertexShader.shader",
+		fragmentPath: "\\shader\\fragmentShader.shader",
+		id:           0,
+	}
+	programmDatas[1] = ProgrammData{
+		vertexPath:   "\\shader\\vertexShaderInstancing.shader",
+		fragmentPath: "\\shader\\fragmentShader.shader",
+		id:           0,
+	}
 
 	for i, programmData := range programmDatas {
 		// Configure the vertex and fragment shaders
@@ -63,10 +76,6 @@ func setUpRenderer() {
 		gl.DeleteShader(vertexShader)
 		gl.DeleteShader(fragmentShader)
 
-		// Perspective Projection matrix
-		projectionUniform = gl.GetUniformLocation(program, gl.Str("projection\x00"))
-		cameraTransformUniform = gl.GetUniformLocation(program, gl.Str("camera\x00"))
-
 		// Output data Flag
 		gl.BindFragDataLocation(program, 0, gl.Str("outputColor\x00"))
 
@@ -78,6 +87,8 @@ func setUpRenderer() {
 	gl.Enable(gl.DEPTH_TEST)
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0, 0, 0, 0)
+
+	printGlErrors("Gl SetUp")
 }
 
 // SetActiveCameraEntity sets the given entity as the camera. The given entity must have a camera component.
@@ -91,22 +102,41 @@ func SetActiveCameraEntity(entityId int) {
 func renderRenderer() {
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-	cameraTransform := GetComponent(cameraEntityId, ComponentTransform).(Transform)
-	// Creating inverted Camera pos
-	view := cameraTransform.matrix.Inv()
-	gl.UniformMatrix4fv(cameraTransformUniform, 1, false, &view[0])
+	// Mesh
 
-	camera := GetComponent(cameraEntityId, ComponentCamera).(Camera)
-	gl.UniformMatrix4fv(projectionUniform, 1, false, &camera.projection[0])
+	gl.UseProgram(programmDatas[0].id)
+	pushCameraUniform()
 
 	entities := GetAllEntitiesWithComponent(ComponentMesh)
 	for _, entity := range entities {
 		renderMesh(entity)
 	}
 
-	gl.BindVertexArray(0)
+	/*
+		// Mesh Instancing
+		gl.UseProgram(programmDatas[1].id)
+		pushCameraUniform()
 
+		entities := GetAllEntitiesWithComponent(ComponentMeshInstantRoot)
+		for _, entity := range entities {
+			renderMeshIstantRoot(entity)
+		}
+	*/
+
+	gl.BindVertexArray(0)
 	deleteUnUsedVAOs()
+
+	printGlErrors("RenderLoop")
+}
+
+func pushCameraUniform() {
+	cameraTransform := GetComponent(cameraEntityId, ComponentTransform).(Transform)
+	// Creating inverted Camera pos
+	view := cameraTransform.matrix.Inv()
+	gl.UniformMatrix4fv(1, 1, false, &view[0])
+
+	camera := GetComponent(cameraEntityId, ComponentCamera).(Camera)
+	gl.UniformMatrix4fv(0, 1, false, &camera.projection[0])
 }
 
 const vertexStride int32 = 3 * 4
@@ -119,4 +149,32 @@ func deleteUnUsedVAOs() {
 		gl.DeleteVertexArrays(1, &vao)
 	}
 	unUsedVAOs = []uint32{}
+}
+
+func printGlErrors(place string) {
+	glerror := gl.GetError()
+	if glerror == gl.NO_ERROR {
+		return
+	}
+
+	fmt.Printf("GLError from %s ", place)
+
+	switch glerror {
+	case gl.INVALID_ENUM:
+		fmt.Printf("GL_INVALID_ENUM")
+	case gl.INVALID_VALUE:
+		fmt.Printf("GL_INVALID_VALUE")
+	case gl.INVALID_OPERATION:
+		fmt.Printf("GL_INVALID_OPERATION")
+	case gl.STACK_OVERFLOW:
+		fmt.Printf("GL_STACK_OVERFLOW")
+	case gl.STACK_UNDERFLOW:
+		fmt.Printf("GL_STACK_UNDERFLOW")
+	case gl.OUT_OF_MEMORY:
+		fmt.Printf("GL_OUT_OF_MEMORY")
+	default:
+		fmt.Printf("%d", glerror)
+	}
+
+	fmt.Printf("\n")
 }

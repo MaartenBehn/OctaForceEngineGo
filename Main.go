@@ -86,6 +86,7 @@ func runRender() {
 		// All render Calls
 		renderRenderer()
 		renderWindow()
+		printGlErrors("Render ")
 
 		diff := time.Since(startTime) - startDuration
 		if diff > 0 {
@@ -139,6 +140,7 @@ func runUpdate() {
 		updateWindow()
 		updateAllComponents()
 		gameUpdateFunction()
+		printGlErrors("Update")
 
 		diff := time.Since(startTime) - startDuration
 		if diff > 0 {
