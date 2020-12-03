@@ -92,7 +92,7 @@ func runRender() {
 		if diff > 0 {
 			fps = (wait.Seconds() / diff.Seconds()) * maxFPS
 		} else {
-			fps = 10000
+			fps = 1000000
 		}
 		if diff < wait {
 			time.Sleep(wait - diff)
@@ -145,7 +145,7 @@ func runUpdate() {
 		if diff > 0 {
 			ups = (wait.Seconds() / diff.Seconds()) * maxUPS
 		} else {
-			ups = 10000
+			ups = 1000000
 		}
 		if diff < wait {
 			updateDeltaTime = wait.Seconds()
