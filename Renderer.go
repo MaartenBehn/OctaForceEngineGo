@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/go-gl/gl/v4.6-core/gl"
+	"github.com/go-gl/gl/v4.1-core/gl"
 )
 
 var (
@@ -88,8 +88,6 @@ func setUpRenderer() {
 	gl.Enable(gl.DEPTH_TEST)
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0, 0, 0, 0)
-
-	printGlErrors("Gl SetUp")
 }
 
 // SetActiveCameraEntity sets the given entity as the camera. The given entity must have a camera component.
@@ -119,12 +117,7 @@ func renderRenderer() {
 
 	gl.BindVertexArray(0)
 	deleteUnUsedVAOs()
-
-	printGlErrors("RenderLoop")
 }
-
-const vertexStride int32 = 3 * 4
-const instanceStride int32 = 19 * 4
 
 var unUsedVAOs []uint32
 

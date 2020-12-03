@@ -86,7 +86,7 @@ func runRender() {
 		// All render Calls
 		renderRenderer()
 		renderWindow()
-		printGlErrors("Render ")
+		printGlErrors("RenderLoop")
 
 		diff := time.Since(startTime) - startDuration
 		if diff > 0 {

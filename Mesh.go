@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/go-gl/gl/v4.6-core/gl"
+	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -65,7 +65,6 @@ func renderMeshes() {
 		gl.Uniform3f(3, mesh.Material.DiffuseColor[0], mesh.Material.DiffuseColor[1], mesh.Material.DiffuseColor[2])
 
 		gl.DrawElements(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_INT, nil)
-		printGlErrors("Mesh Render")
 
 	}
 }
@@ -92,6 +91,8 @@ func renderInstantMeshes() {
 	}
 }
 
+const vertexStride int32 = 3 * 4
+
 func pushVertexData(mesh Mesh) {
 	var vertexData []float32
 	for _, vertex := range mesh.Vertices {
@@ -116,8 +117,10 @@ func pushVertexData(mesh Mesh) {
 	gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(mesh.Indices)*4, gl.Ptr(mesh.Indices), gl.STATIC_DRAW)
 
 	mesh.needsMeshUpdate = false
-	printGlErrors("Vertex SetUp")
 }
+
+const instanceStride int32 = 19 * 4
+
 func pushInstanceData(mesh Mesh, entityId int) {
 	if mesh.needsInstanceUpdate {
 		// Instance VBO

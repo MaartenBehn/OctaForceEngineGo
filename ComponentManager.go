@@ -96,8 +96,10 @@ func DeleteEntity(id int) {
 func HasEntity(entityId int) bool {
 
 	componentsMutex.Lock()
-	defer componentsMutex.Unlock()
-	return len(components) >= entityId && components[entityId] != nil
+	hasEntity := len(components) >= entityId && components[entityId] != nil
+	componentsMutex.Unlock()
+
+	return hasEntity
 }
 
 // GetAllEntitiesWithComponent returns List of all entities with the given component.
@@ -137,16 +139,19 @@ func AddComponent(entityId int, componentId int) interface{} {
 // Will not check if any components are dependent on it before it is removed.
 func RemoveComponent(entityId int, componentId int) {
 	id := -1
+
 	componentsMutex.Lock()
 	component := components[entityId][componentId].component
 	for _, componentContainer := range components[entityId] {
 		if componentContainer.id == componentId {
 			id = componentContainer.id
-
 		}
 	}
+
 	if id <= 0 {
+
 		components[entityId] = append(components[entityId][:id], components[entityId][id+1:]...)
+
 		if funcTable[componentId][componentFuncRemove] != nil {
 			funcTable[componentId][componentFuncRemove](component)
 		}
@@ -235,7 +240,7 @@ func GetAllComponentsOfId(id int) []interface{} {
 	componentsMutex.Lock()
 	for entityId, _ := range components {
 		if components[entityId][id].component != nil {
-			componentSet = append(componentSet, components[entityId][id])
+			componentSet = append(componentSet, components[entityId][id].component)
 		}
 	}
 	componentsMutex.Unlock()
