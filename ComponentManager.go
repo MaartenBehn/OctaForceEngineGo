@@ -5,8 +5,8 @@ import "sync"
 const (
 	ComponentTransform   = 1
 	ComponentMesh        = 2
-	ComponentMeshInstant = 4
-	ComponentCamera      = 5
+	ComponentMeshInstant = 3
+	ComponentCamera      = 4
 )
 const (
 	componentFuncAdd    = 0
@@ -16,7 +16,13 @@ const (
 	componentFuncRemove = 4
 )
 
-var components map[int]map[int]interface{}
+type ComponentContainer struct {
+	id        int
+	entityId  int
+	component interface{}
+}
+
+var components [][]ComponentContainer
 var componentsMutex sync.Mutex
 var dependencyTable map[int][]int
 var funcTable map[int]map[int]func(component interface{}) interface{}
@@ -26,7 +32,7 @@ func setUpComponentTables() {
 	componentsMutex.Lock()
 	defer componentsMutex.Unlock()
 
-	components = map[int]map[int]interface{}{}
+	components = make([][]ComponentContainer, 0)
 
 	dependencyTable = map[int][]int{}
 	dependencyTable[ComponentTransform] = []int{}
@@ -52,7 +58,6 @@ func setUpComponentTables() {
 	funcTable[ComponentCamera][componentFuncAdd] = setUpCamera
 }
 
-var idCounter int
 var freedIds []int
 
 // CreateEntity creates a new entity and returns its id.
@@ -62,14 +67,13 @@ func CreateEntity() int {
 		id = freedIds[0]
 		freedIds = append(freedIds[:0], freedIds[1:]...)
 	} else {
-		idCounter++
-		id = idCounter
+
+		componentsMutex.Lock()
+		components = append(components, make([]ComponentContainer, 0))
+		componentsMutex.Unlock()
+
+		id = len(components) - 1
 	}
-
-	componentsMutex.Lock()
-	components[id] = map[int]interface{}{}
-	componentsMutex.Unlock()
-
 	return id
 }
 
@@ -77,7 +81,7 @@ func CreateEntity() int {
 func DeleteEntity(id int) {
 
 	componentsMutex.Lock()
-	delete(components, id)
+	components[id] = make([]ComponentContainer, 0)
 	componentsMutex.Unlock()
 
 	freedIds = append(freedIds, id)
@@ -85,9 +89,10 @@ func DeleteEntity(id int) {
 
 // HasEntity returns true if entity of id exists.
 func HasEntity(entityId int) bool {
+
 	componentsMutex.Lock()
 	defer componentsMutex.Unlock()
-	return components[entityId] != nil
+	return len(components) >= entityId && components[entityId] != nil
 }
 
 // GetAllEntitiesWithComponent returns List of all entities with the given component.
@@ -96,8 +101,10 @@ func GetAllEntitiesWithComponent(id int) []int {
 
 	componentsMutex.Lock()
 	for entityId, _ := range components {
-		if components[entityId][id] != nil {
-			entities = append(entities, entityId)
+		for _, component := range components[entityId] {
+			if component.id == id {
+				entities = append(entities, entityId)
+			}
 		}
 	}
 	componentsMutex.Unlock()
@@ -112,7 +119,11 @@ func AddComponent(entityId int, componentId int) interface{} {
 	component := funcTable[componentId][componentFuncAdd](nil)
 
 	componentsMutex.Lock()
-	components[entityId][componentId] = component
+	components[entityId] = append(components[entityId], ComponentContainer{
+		id:        componentId,
+		entityId:  entityId,
+		component: component,
+	})
 	componentsMutex.Unlock()
 
 	for _, dependency := range dependencyTable[componentId] {
@@ -128,8 +139,12 @@ func AddComponent(entityId int, componentId int) interface{} {
 func RemoveComponent(entityId int, componentId int) {
 
 	componentsMutex.Lock()
-	component := components[entityId][componentId]
-	delete(components[entityId], componentId)
+	component := components[entityId][componentId].component
+	for i, componentContainer := range components[entityId] {
+		if componentContainer.id == componentId {
+			components[entityId] = append(components[entityId][:i], components[entityId][i+1:]...)
+		}
+	}
 	componentsMutex.Unlock()
 
 	if funcTable[componentId][componentFuncRemove] != nil {
@@ -144,22 +159,40 @@ func SetComponent(entityId int, componentId int, component interface{}) {
 	}
 
 	componentsMutex.Lock()
-	components[entityId][componentId] = component
+	for i, componentContainer := range components[entityId] {
+		if componentContainer.id == componentId {
+			components[entityId][i].component = component
+		}
+	}
 	componentsMutex.Unlock()
 }
 
 // HasComponent return true if given component on given entity exists.
 func HasComponent(entityId int, componentId int) bool {
+
+	hasComponent := false
+
 	componentsMutex.Lock()
-	defer componentsMutex.Unlock()
-	return components[entityId][componentId] != nil
+	for _, componentContainer := range components[entityId] {
+		if componentContainer.id == componentId {
+			hasComponent = true
+		}
+	}
+	componentsMutex.Unlock()
+
+	return hasComponent
 }
 
 // GetComponent returns copy of the value of given component on given entity.
 func GetComponent(entityId int, componentId int) interface{} {
 
+	var component interface{}
 	componentsMutex.Lock()
-	component := components[entityId][componentId]
+	for _, componentContainer := range components[entityId] {
+		if componentContainer.id == componentId {
+			component = componentContainer.component
+		}
+	}
 	componentsMutex.Unlock()
 
 	if funcTable[componentId][componentFuncGet] != nil {
@@ -169,7 +202,11 @@ func GetComponent(entityId int, componentId int) interface{} {
 			component = newComponent
 
 			componentsMutex.Lock()
-			components[entityId][componentId] = component
+			for i, componentContainer := range components[entityId] {
+				if componentContainer.id == componentId {
+					components[entityId][i].component = component
+				}
+			}
 			componentsMutex.Unlock()
 		}
 	}
@@ -182,7 +219,7 @@ func GetAllComponentsOfId(id int) []interface{} {
 
 	componentsMutex.Lock()
 	for entityId, _ := range components {
-		if components[entityId][id] != nil {
+		if components[entityId][id].component != nil {
 			componentSet = append(componentSet, components[entityId][id])
 		}
 	}
@@ -195,10 +232,10 @@ func updateAllComponents() {
 
 	componentsMutex.Lock()
 	for i, entity := range components {
-		for j, component := range entity {
+		for j, componentContainer := range entity {
 			if funcTable[j][componentFuncUpdate] != nil {
-				component = funcTable[j][componentFuncUpdate](component)
-				components[i][j] = component
+				componentContainer.component = funcTable[j][componentFuncUpdate](componentContainer.component)
+				components[i][j] = componentContainer
 			}
 		}
 	}

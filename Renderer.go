@@ -38,13 +38,13 @@ func setUpRenderer() {
 
 	programmDatas = make([]ProgrammData, 2)
 	programmDatas[0] = ProgrammData{
-		vertexPath:   "\\shader\\vertexShader.shader",
-		fragmentPath: "\\shader\\fragmentShader.shader",
+		vertexPath:   "/shader/vertexShader.shader",
+		fragmentPath: "/shader/fragmentShader.shader",
 		renderFunc:   renderMeshes,
 	}
 	programmDatas[1] = ProgrammData{
-		vertexPath:   "\\shader\\vertexShaderInstancing.shader",
-		fragmentPath: "\\shader\\fragmentShader.shader",
+		vertexPath:   "/shader/vertexShaderInstancing.shader",
+		fragmentPath: "/shader/fragmentShader.shader",
 		renderFunc:   renderInstantMeshes,
 	}
 
