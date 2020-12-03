@@ -14,14 +14,14 @@ var (
 	cameraEntityId int
 )
 
-type ProgrammData struct {
+type programmData struct {
 	vertexPath   string
 	fragmentPath string
 	id           uint32
 	renderFunc   func()
 }
 
-var programmDatas []ProgrammData
+var programmDatas []programmData
 
 func setUpRenderer() {
 
@@ -36,13 +36,13 @@ func setUpRenderer() {
 	gl.Enable(gl.DEBUG_OUTPUT)
 	gl.DebugMessageCallback(nil, nil)
 
-	programmDatas = make([]ProgrammData, 2)
-	programmDatas[0] = ProgrammData{
+	programmDatas = make([]programmData, 2)
+	programmDatas[0] = programmData{
 		vertexPath:   "/shader/vertexShader.shader",
 		fragmentPath: "/shader/fragmentShader.shader",
 		renderFunc:   renderMeshes,
 	}
-	programmDatas[1] = ProgrammData{
+	programmDatas[1] = programmData{
 		vertexPath:   "/shader/vertexShaderInstancing.shader",
 		fragmentPath: "/shader/fragmentShader.shader",
 		renderFunc:   renderInstantMeshes,
@@ -88,14 +88,6 @@ func setUpRenderer() {
 	gl.Enable(gl.DEPTH_TEST)
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0, 0, 0, 0)
-}
-
-// SetActiveCameraEntity sets the given entity as the camera. The given entity must have a camera component.
-// This function does not check that, so be careful.
-func SetActiveCameraEntity(entityId int) {
-	if HasComponent(entityId, ComponentCamera) {
-		cameraEntityId = entityId
-	}
 }
 
 func renderRenderer() {

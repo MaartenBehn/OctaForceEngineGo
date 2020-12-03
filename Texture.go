@@ -9,6 +9,7 @@ import (
 	"os"
 )
 
+// Texture is not used at the Moment
 type Texture struct {
 	Id          uint32
 	TextureType string

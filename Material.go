@@ -7,10 +7,13 @@ import (
 	"strings"
 )
 
+// Material is a Struct with is needed by the Mesh Component to set the Color of an Mesh.
 type Material struct {
 	DiffuseColor mgl32.Vec3
 }
 
+// LoadMtl loads the material file of an OBJ File.
+// But you can also just set the loadMaterials bool in the LoadOBJ function of the Mesh Component to true.
 func LoadMtl(path string) []Material {
 	content, err := ioutil.ReadFile(path)
 	if err != nil {

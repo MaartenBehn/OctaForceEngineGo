@@ -26,8 +26,8 @@ func StartUp(gameStartUpFunc func(), gameUpdateFunc func(), gameStopFunc func())
 
 	// setting var values
 	gameUpdateFunction = gameUpdateFunc
-	maxFPS = 60
-	maxUPS = 30
+	MaxFPS = 60
+	MaxUPS = 30
 	running = true
 
 	// Initialising vars
@@ -56,29 +56,24 @@ var running bool
 var fps float64
 
 // GetFPS returns the current frames per second.
-// 0 is an edge case and can mean that they are 0 or actually infinite.
 func GetFPS() float64 {
 	return fps
 }
 
 // GetCappedFPS returns the current frames per second capped to max fps value set.
-// 0 is an edge case and can mean that they are 0 or actually infinite.
 func GetCappedFPS() float64 {
-	if fps > maxFPS {
-		fps = maxFPS
+	if fps > MaxFPS {
+		fps = MaxFPS
 	}
 	return fps
 }
 
-var maxFPS float64
+var MaxFPS float64
 
-func SetMaxFPS(_maxFPS float64) {
-	maxFPS = _maxFPS
-}
 func runRender() {
 	startTime := time.Now()
 	var startDuration time.Duration
-	wait := time.Duration(1.0 / maxFPS * 1000000000)
+	wait := time.Duration(1.0 / MaxFPS * 1000000000)
 
 	for running {
 		startDuration = time.Since(startTime)
@@ -90,9 +85,9 @@ func runRender() {
 
 		diff := time.Since(startTime) - startDuration
 		if diff > 0 {
-			fps = (wait.Seconds() / diff.Seconds()) * maxFPS
+			fps = (wait.Seconds() / diff.Seconds()) * MaxFPS
 		} else {
-			fps = 1000000
+			fps = 10000
 		}
 		if diff < wait {
 			time.Sleep(wait - diff)
@@ -111,27 +106,24 @@ func GetUPS() float64 {
 // GetCappedUPS returns the current updates per second capped to max ups value set.
 // 0 is an edge case and can mean that they are 0 or actually infinite.
 func GetCappedUPS() float64 {
-	if ups > maxUPS {
-		ups = maxUPS
+	if ups > MaxUPS {
+		ups = MaxUPS
 	}
 	return ups
 }
 
-var maxUPS float64
-
-func SetMaxUPS(_maxUPS float64) {
-	maxUPS = _maxUPS
-}
+var MaxUPS float64
 
 var updateDeltaTime float64
 
+// GetDeltaTime return the Time (Sek) passed since last Update.
 func GetDeltaTime() float64 {
 	return updateDeltaTime
 }
 func runUpdate() {
 	startTime := time.Now()
 	var startDuration time.Duration
-	wait := time.Duration(1.0 / maxUPS * 1000000000)
+	wait := time.Duration(1.0 / MaxUPS * 1000000000)
 
 	for running {
 		startDuration = time.Since(startTime)
@@ -143,9 +135,9 @@ func runUpdate() {
 
 		diff := time.Since(startTime) - startDuration
 		if diff > 0 {
-			ups = (wait.Seconds() / diff.Seconds()) * maxUPS
+			ups = (wait.Seconds() / diff.Seconds()) * MaxUPS
 		} else {
-			ups = 1000000
+			ups = 10000
 		}
 		if diff < wait {
 			updateDeltaTime = wait.Seconds()

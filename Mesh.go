@@ -9,32 +9,35 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-type Vertex struct {
+type vertex struct {
 	Position mgl32.Vec3
 	Normal   mgl32.Vec3
 	UVCord   mgl32.Vec2
 }
 
+// Mesh holds all data needed to render a 3D Object.
+// When you change Vertices or Indices buy your self don't forget to set NeedsVertexUpdate to true. Otherwise the changes
+// will not be applied.
 type Mesh struct {
-	Vertices        []Vertex
-	Indices         []uint32
-	vao             uint32
-	vertexVBO       uint32
-	ebo             uint32
-	Material        Material
-	needsMeshUpdate bool
+	Vertices          []vertex
+	Indices           []uint32
+	vao               uint32
+	vertexVBO         uint32
+	ebo               uint32
+	Material          Material
+	NeedsVertexUpdate bool
 
 	instanceVBO         uint32
 	instances           []int
 	needsInstanceUpdate bool
 }
 
-func setUpMesh(_ interface{}) interface{} {
+func setUpMesh(_ interface{}, entityId int) interface{} {
 	mesh := Mesh{}
 	gl.GenVertexArrays(1, &mesh.vao)
 	return mesh
 }
-func deleteMesh(component interface{}) interface{} {
+func deleteMesh(component interface{}, entityId int) interface{} {
 	mesh := component.(Mesh)
 	unUsedVAOs = append(unUsedVAOs, mesh.vao)
 	return nil
@@ -52,7 +55,7 @@ func renderMeshes() {
 
 		gl.BindVertexArray(mesh.vao)
 
-		if mesh.needsMeshUpdate {
+		if mesh.NeedsVertexUpdate {
 			pushVertexData(mesh)
 			SetComponent(entityId, ComponentMesh, mesh)
 		}
@@ -80,7 +83,7 @@ func renderInstantMeshes() {
 
 		gl.BindVertexArray(mesh.vao)
 
-		if mesh.needsMeshUpdate {
+		if mesh.NeedsVertexUpdate {
 			pushVertexData(mesh)
 			SetComponent(entityId, ComponentMesh, mesh)
 		}
@@ -103,7 +106,7 @@ func pushVertexData(mesh Mesh) {
 		}...)
 	}
 
-	// Vertex VBO
+	// vertex VBO
 	gl.GenBuffers(1, &mesh.vertexVBO)
 	gl.BindBuffer(gl.ARRAY_BUFFER, mesh.vertexVBO)
 	gl.BufferData(gl.ARRAY_BUFFER, len(vertexData)*4, gl.Ptr(vertexData), gl.STATIC_DRAW)
@@ -116,7 +119,7 @@ func pushVertexData(mesh Mesh) {
 	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.ebo)
 	gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(mesh.Indices)*4, gl.Ptr(mesh.Indices), gl.STATIC_DRAW)
 
-	mesh.needsMeshUpdate = false
+	mesh.NeedsVertexUpdate = false
 }
 
 const instanceStride int32 = 19 * 4
@@ -264,7 +267,7 @@ func (mesh *Mesh) LoadOBJ(path string, loadMaterials bool) {
 		}
 	}
 
-	mesh.Vertices = make([]Vertex, len(vertices))
+	mesh.Vertices = make([]vertex, len(vertices))
 	mesh.Material = material
 	for _, face := range faces {
 		for _, values := range face {
@@ -277,26 +280,28 @@ func (mesh *Mesh) LoadOBJ(path string, loadMaterials bool) {
 		}
 	}
 
-	mesh.needsMeshUpdate = true
+	mesh.NeedsVertexUpdate = true
 }
 
-// LoadOBJ returns the mesh struct of the given OBJ file.
-
+// MeshInstant is a Component that creates an Instant of the Mesh Component of MeshEntity.
+// Transform and Material are individual changeable.
 type MeshInstant struct {
-	OwnEntity          int
-	MeshEntity         int
+	MeshEntity int
+	Material   Material
+
+	ownEntity          int
 	currentlySetEntity int
-
-	Material Material
 }
 
-func setUpMeshInstant(_ interface{}) interface{} {
-	return MeshInstant{}
+func setUpMeshInstant(_ interface{}, entityId int) interface{} {
+	return MeshInstant{
+		ownEntity: entityId,
+	}
 }
-func addMeshInstant(component interface{}) interface{} {
+func addMeshInstant(component interface{}, entityId int) interface{} {
 	meshInstant := component.(MeshInstant)
 
-	if meshInstant.OwnEntity == 0 || meshInstant.MeshEntity == 0 {
+	if meshInstant.ownEntity == 0 || meshInstant.MeshEntity == 0 {
 		return component
 	}
 
@@ -309,7 +314,7 @@ func addMeshInstant(component interface{}) interface{} {
 		}
 
 		mesh := GetComponent(meshInstant.MeshEntity, ComponentMesh).(Mesh)
-		mesh.instances = append(mesh.instances, meshInstant.OwnEntity)
+		mesh.instances = append(mesh.instances, meshInstant.ownEntity)
 		mesh.needsInstanceUpdate = true
 		SetComponent(meshInstant.MeshEntity, ComponentMesh, mesh)
 
@@ -318,7 +323,7 @@ func addMeshInstant(component interface{}) interface{} {
 
 	return meshInstant
 }
-func removeMeshInstant(component interface{}) interface{} {
+func removeMeshInstant(component interface{}, entityId int) interface{} {
 	meshInstant := component.(MeshInstant)
 
 	if HasComponent(meshInstant.currentlySetEntity, ComponentMesh) {

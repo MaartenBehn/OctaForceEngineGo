@@ -45,6 +45,7 @@ func updateWindow() {
 	mousePos = mgl32.Vec2{float32(mouseX), float32(mouseY)}
 }
 
+// KeyPressed returns true when the Key is pressed.
 func KeyPressed(key int) bool {
 	return window.GetKey(glfw.Key(key)) == glfw.Press
 }
@@ -172,6 +173,7 @@ const (
 	KeyLast         int = int(glfw.KeyLast)
 )
 
+// MouseButtonPressed returns true when the mouse key is pressed.
 func MouseButtonPressed(button int) bool {
 	return window.GetMouseButton(glfw.MouseButton(button)) == glfw.Press
 }
@@ -192,12 +194,14 @@ const (
 
 var mousePos mgl32.Vec2
 
+// GetMousePos returns the position of the Mouse relative to the screen.
 func GetMousePos() mgl32.Vec2 {
 	return mousePos
 }
 
 var mouseMovement mgl32.Vec2
 
+// GetMouseMovement returns the relative movement since the update.
 func GetMouseMovement() mgl32.Vec2 {
 	return mouseMovement
 }

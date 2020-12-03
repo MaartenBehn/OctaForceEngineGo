@@ -2,6 +2,7 @@ package OctaForceEngine
 
 import "github.com/go-gl/mathgl/mgl32"
 
+// Transform is the Component that hold the position and rotation data of the entity.
 type Transform struct {
 	Position       mgl32.Vec3
 	rotation       mgl32.Vec3
@@ -10,17 +11,17 @@ type Transform struct {
 	matrix         mgl32.Mat4
 }
 
-func setUpTransform(_ interface{}) interface{} {
+func setUpTransform(_ interface{}, entityId int) interface{} {
 	transform := Transform{
 		Position: mgl32.Vec3{0, 0, 0},
 		rotation: mgl32.Vec3{0, 0, 0},
 		Scale:    mgl32.Vec3{1, 1, 1}}
 
 	transform.calcRotationMatrix()
-	transform = setTransformMatrix(transform).(Transform)
+	transform = setTransformMatrix(transform, entityId).(Transform)
 	return transform
 }
-func setTransformMatrix(component interface{}) interface{} {
+func setTransformMatrix(component interface{}, entityId int) interface{} {
 	transform := component.(Transform)
 	transform.matrix = mgl32.Translate3D(
 		transform.Position.X(),
