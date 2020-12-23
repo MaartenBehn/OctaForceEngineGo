@@ -13,7 +13,7 @@ const (
 
 var window *glfw.Window
 
-func setUpWindow() {
+func setUpWindow(name string) {
 	var err error
 
 	// Setting up Window
@@ -22,7 +22,7 @@ func setUpWindow() {
 	glfw.WindowHint(glfw.ContextVersionMinor, 1)
 	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
 	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
-	window, err = glfw.CreateWindow(windowWidth, windowHeight, "Cube", nil, nil)
+	window, err = glfw.CreateWindow(windowWidth, windowHeight, name, nil, nil)
 	if err != nil {
 		panic(err)
 	}

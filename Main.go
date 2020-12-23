@@ -20,7 +20,7 @@ var gameUpdateFunction func()
 // StartUp needs to be called in the game main function. It requires a game start function and stop function.
 // The game start function is called after StartUp but before the update calls. So do here all initial game engine setup.
 // The game stop function is called when the game stops. So do here all stuff you need to do when the game stops.
-func StartUp(gameStartUpFunc func(), gameUpdateFunc func(), gameStopFunc func()) {
+func StartUp(gameStartUpFunc func(), gameUpdateFunc func(), gameStopFunc func(), name string) {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	runtime.LockOSThread()
 
@@ -38,7 +38,7 @@ func StartUp(gameStartUpFunc func(), gameUpdateFunc func(), gameStopFunc func())
 	defer glfw.Terminate()
 
 	// internal setup calls
-	setUpWindow()
+	setUpWindow(name)
 	setUpRenderer()
 	setUpComponentTables()
 
