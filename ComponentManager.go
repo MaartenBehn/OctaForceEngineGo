@@ -25,6 +25,7 @@ type componentContainer struct {
 }
 
 var components [][]componentContainer
+
 var componentsMutex sync.Mutex
 var entityWithComponents [][]int
 
