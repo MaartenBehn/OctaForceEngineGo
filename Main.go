@@ -38,12 +38,14 @@ func StartUp(gameStartUpFunc func(), gameUpdateFunc func(), gameStopFunc func(),
 	defer glfw.Terminate()
 
 	// internal setup calls
+	setUpWorld()
 	setUpWindow(name)
 	setUpRenderer()
 	setUpComponentTables()
 
 	// parsed game setup call
 	gameStartUpFunc() //(I need to do it in that way because somehow the glfw context only applies if a func is in the stack higher than the init call.)
+	world.write()
 
 	go runUpdate() // Running the update calls on sprat thread.
 	runRender()    // The render calls needs run on the main tread so the glfw init call system still applies.
@@ -130,8 +132,11 @@ func runUpdate() {
 
 		// All update Calls
 		updateWindow()
-		updateAllComponents()
+
 		gameUpdateFunction()
+
+		world.write()
+		world.update()
 
 		diff := time.Since(startTime) - startDuration
 		if diff > 0 {

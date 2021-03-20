@@ -32,8 +32,14 @@ type Mesh struct {
 	needsInstanceUpdate bool
 }
 
-func setUpMesh(_ interface{}, entityId int) interface{} {
-	mesh := Mesh{}
+func setUpMesh(data interface{}, entityId int) interface{} {
+	var mesh Mesh
+	if data == nil {
+		mesh = Mesh{}
+	} else {
+		mesh = data.(Mesh)
+	}
+
 	gl.GenVertexArrays(1, &mesh.vao)
 	return mesh
 }
@@ -44,7 +50,7 @@ func deleteMesh(component interface{}, entityId int) interface{} {
 }
 
 func renderMeshes() {
-	entities := GetAllEntitiesWithComponent(ComponentMesh)
+	entities := world.getAllEntityIdsWithComponent(ComponentMesh)
 
 	for _, entityId := range entities {
 
@@ -57,7 +63,7 @@ func renderMeshes() {
 
 		if mesh.NeedsVertexUpdate {
 			pushVertexData(mesh)
-			SetComponent(entityId, ComponentMesh, mesh)
+			setComponentInternal(entityId, ComponentMesh, mesh)
 		}
 
 		// Transform
@@ -72,7 +78,7 @@ func renderMeshes() {
 	}
 }
 func renderInstantMeshes() {
-	entities := GetAllEntitiesWithComponent(ComponentMesh)
+	entities := world.getAllEntityIdsWithComponent(ComponentMesh)
 
 	for _, entityId := range entities {
 
@@ -85,7 +91,7 @@ func renderInstantMeshes() {
 
 		if mesh.NeedsVertexUpdate {
 			pushVertexData(mesh)
-			SetComponent(entityId, ComponentMesh, mesh)
+			setComponentInternal(entityId, ComponentMesh, mesh)
 		}
 
 		pushInstanceData(mesh, entityId)
@@ -310,13 +316,13 @@ func addMeshInstant(component interface{}, entityId int) interface{} {
 		if HasComponent(meshInstant.currentlySetEntity, ComponentMesh) {
 			mesh := GetComponent(meshInstant.currentlySetEntity, ComponentMesh).(Mesh)
 			mesh.removeMeshInstantFromMesh(meshInstant)
-			SetComponent(meshInstant.currentlySetEntity, ComponentMesh, mesh)
+			setComponentInternal(meshInstant.currentlySetEntity, ComponentMesh, mesh)
 		}
 
 		mesh := GetComponent(meshInstant.MeshEntity, ComponentMesh).(Mesh)
 		mesh.instances = append(mesh.instances, meshInstant.ownEntity)
 		mesh.needsInstanceUpdate = true
-		SetComponent(meshInstant.MeshEntity, ComponentMesh, mesh)
+		setComponentInternal(meshInstant.MeshEntity, ComponentMesh, mesh)
 
 		meshInstant.currentlySetEntity = meshInstant.MeshEntity
 	}
@@ -329,7 +335,7 @@ func removeMeshInstant(component interface{}, entityId int) interface{} {
 	if HasComponent(meshInstant.currentlySetEntity, ComponentMesh) {
 		mesh := GetComponent(meshInstant.currentlySetEntity, ComponentMesh).(Mesh)
 		mesh.removeMeshInstantFromMesh(meshInstant)
-		SetComponent(meshInstant.currentlySetEntity, ComponentMesh, mesh)
+		setComponentInternal(meshInstant.currentlySetEntity, ComponentMesh, mesh)
 	}
 
 	return meshInstant

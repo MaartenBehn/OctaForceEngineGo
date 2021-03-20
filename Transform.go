@@ -11,11 +11,16 @@ type Transform struct {
 	matrix         mgl32.Mat4
 }
 
-func setUpTransform(_ interface{}, entityId int) interface{} {
-	transform := Transform{
-		Position: mgl32.Vec3{0, 0, 0},
-		rotation: mgl32.Vec3{0, 0, 0},
-		Scale:    mgl32.Vec3{1, 1, 1}}
+func setUpTransform(data interface{}, entityId int) interface{} {
+	var transform Transform
+	if data == nil {
+		transform = Transform{
+			Position: mgl32.Vec3{0, 0, 0},
+			rotation: mgl32.Vec3{0, 0, 0},
+			Scale:    mgl32.Vec3{1, 1, 1}}
+	} else {
+		transform = data.(Transform)
+	}
 
 	transform.calcRotationMatrix()
 	transform = setTransformMatrix(transform, entityId).(Transform)
