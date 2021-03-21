@@ -1,4 +1,4 @@
-package OctaForceEngine
+package V2
 
 import (
 	"fmt"
@@ -10,8 +10,6 @@ import (
 var (
 	version string
 	program uint32
-
-	cameraEntityId int
 )
 
 type programmData struct {
@@ -23,7 +21,7 @@ type programmData struct {
 
 var programmDatas []programmData
 
-func setUpRenderer() {
+func initRenderer() {
 
 	var err error
 	// Initialize Gl
@@ -40,21 +38,21 @@ func setUpRenderer() {
 	programmDatas[0] = programmData{
 		vertexPath:   "/shader/vertexShader.shader",
 		fragmentPath: "/shader/fragmentShader.shader",
-		renderFunc:   renderMeshes,
+		renderFunc: renderMeshes,
 	}
 	programmDatas[1] = programmData{
 		vertexPath:   "/shader/vertexShaderInstancing.shader",
 		fragmentPath: "/shader/fragmentShader.shader",
-		renderFunc:   renderInstantMeshes,
+		renderFunc: renderInstantMeshes,
 	}
 
 	for i, programmData := range programmDatas {
 		// Configure the vertex and fragment shaders
-		vertexShader, err := compileShader(absPath+programmData.vertexPath, gl.VERTEX_SHADER)
+		vertexShader, err := compileShader(absPath + programmData.vertexPath, gl.VERTEX_SHADER)
 		if err != nil {
 			panic(err)
 		}
-		fragmentShader, err := compileShader(absPath+programmData.fragmentPath, gl.FRAGMENT_SHADER)
+		fragmentShader, err := compileShader(absPath + programmData.fragmentPath, gl.FRAGMENT_SHADER)
 		if err != nil {
 			panic(err)
 		}
@@ -88,6 +86,16 @@ func setUpRenderer() {
 	gl.Enable(gl.DEPTH_TEST)
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0, 0, 0, 0)
+
+	task := NewTask(renderRenderer)
+	task.SetRepeating(true)
+	task.SetWorker(workerRender)
+	AddTask(task)
+
+	task = NewTask(printGlErrors)
+	task.SetRepeating(true)
+	task.SetWorker(workerRender)
+	AddTask(task)
 }
 
 func renderRenderer() {
@@ -96,15 +104,14 @@ func renderRenderer() {
 	for _, programmData := range programmDatas {
 		gl.UseProgram(programmData.id)
 
-		cameraTransform := GetComponent(cameraEntityId, ComponentTransform).(Transform)
-		// Creating inverted Camera pos
-		view := cameraTransform.matrix.Inv()
-		gl.UniformMatrix4fv(1, 1, false, &view[0])
 
-		camera := GetComponent(cameraEntityId, ComponentCamera).(Camera)
-		gl.UniformMatrix4fv(0, 1, false, &camera.projection[0])
+		// Creating inverted Camera pos
+		view := ActiveCameraData.Camera.Transform.matrix.Inv()
+		gl.UniformMatrix4fv(1, 1, false, &view[0])
+		gl.UniformMatrix4fv(0, 1, false, &ActiveCameraData.Camera.projection[0])
 
 		programmData.renderFunc()
+
 	}
 
 	gl.BindVertexArray(0)
@@ -120,13 +127,13 @@ func deleteUnUsedVAOs() {
 	unUsedVAOs = []uint32{}
 }
 
-func printGlErrors(place string) {
+func printGlErrors() {
 	glerror := gl.GetError()
 	if glerror == gl.NO_ERROR {
 		return
 	}
 
-	fmt.Printf("GLError from %s ", place)
+	fmt.Printf("GLError ")
 
 	switch glerror {
 	case gl.INVALID_ENUM:

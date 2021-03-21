@@ -1,49 +1,39 @@
-package OctaForceEngine
+package V2
 
 import "github.com/go-gl/mathgl/mgl32"
 
-// Transform is the Component that hold the position and rotation data of the entity.
 type Transform struct {
-	Position       mgl32.Vec3
+	position       mgl32.Vec3
 	rotation       mgl32.Vec3
 	rotationMatrix mgl32.Mat4
 	Scale          mgl32.Vec3
 	matrix         mgl32.Mat4
 }
 
-func setUpTransform(data interface{}, entityId int) interface{} {
-	var transform Transform
-	if data == nil {
-		transform = Transform{
-			Position: mgl32.Vec3{0, 0, 0},
-			rotation: mgl32.Vec3{0, 0, 0},
-			Scale:    mgl32.Vec3{1, 1, 1}}
-	} else {
-		transform = data.(Transform)
+func NewTransform() *Transform {
+	transform := &Transform{
+		position: mgl32.Vec3{0, 0, 0},
+		rotation: mgl32.Vec3{0, 0, 0},
+		Scale:    mgl32.Vec3{1, 1, 1},
 	}
-
 	transform.calcRotationMatrix()
-	transform = setTransformMatrix(transform, entityId).(Transform)
+	transform.calcMatrix()
 	return transform
 }
-func setTransformMatrix(component interface{}, entityId int) interface{} {
-	transform := component.(Transform)
-	transform.matrix = mgl32.Translate3D(
-		transform.Position.X(),
-		transform.Position.Y(),
-		transform.Position.Z())
-
-	transform.matrix = transform.matrix.Mul4(transform.rotationMatrix)
-
-	return transform
+func (transform *Transform) GetPosition() mgl32.Vec3 {
+	return transform.position
 }
-
+func (transform *Transform) SetPosition(position mgl32.Vec3)  {
+	transform.position = position
+	transform.calcMatrix()
+}
 func (transform *Transform) MoveRelative(vec3 mgl32.Vec3) {
 	vec3 = mgl32.TransformCoordinate(vec3, transform.rotationMatrix)
-	transform.Position = mgl32.Vec3{
-		transform.Position.X() + vec3.X(),
-		transform.Position.Y() + vec3.Y(),
-		transform.Position.Z() + vec3.Z()}
+	transform.position = mgl32.Vec3{
+		transform.position.X() + vec3.X(),
+		transform.position.Y() + vec3.Y(),
+		transform.position.Z() + vec3.Z()}
+	transform.calcMatrix()
 }
 func (transform *Transform) GetRotation() mgl32.Vec3 {
 	return mgl32.Vec3{
@@ -58,6 +48,7 @@ func (transform *Transform) SetRotaion(vec3 mgl32.Vec3) {
 		mgl32.DegToRad(vec3.Z())}
 
 	transform.calcRotationMatrix()
+	transform.calcMatrix()
 }
 func (transform *Transform) Rotate(vec3 mgl32.Vec3) {
 	transform.rotation = mgl32.Vec3{
@@ -66,6 +57,7 @@ func (transform *Transform) Rotate(vec3 mgl32.Vec3) {
 		transform.rotation.Z() + mgl32.DegToRad(vec3.Z())}
 
 	transform.calcRotationMatrix()
+	transform.calcMatrix()
 }
 func (transform *Transform) calcRotationMatrix() {
 	transform.rotationMatrix = mgl32.Ident4()
@@ -75,4 +67,12 @@ func (transform *Transform) calcRotationMatrix() {
 		transform.rotation.X(), mgl32.Vec3{1, 0, 0}))
 	transform.rotationMatrix = transform.rotationMatrix.Mul4(mgl32.HomogRotate3D(
 		transform.rotation.Z(), mgl32.Vec3{0, 0, 1}))
+}
+func (transform *Transform) calcMatrix() {
+	transform.matrix = mgl32.Translate3D(
+		transform.position.X(),
+		transform.position.Y(),
+		transform.position.Z())
+
+	transform.matrix = transform.matrix.Mul4(transform.rotationMatrix)
 }

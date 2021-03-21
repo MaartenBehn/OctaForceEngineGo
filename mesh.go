@@ -1,4 +1,4 @@
-package OctaForceEngine
+package V2
 
 import (
 	"io/ioutil"
@@ -28,33 +28,18 @@ type Mesh struct {
 	NeedsVertexUpdate bool
 
 	instanceVBO         uint32
-	instances           []int
+	instances           []*MeshInstant
 	needsInstanceUpdate bool
-}
 
-func setUpMesh(data interface{}, entityId int) interface{} {
-	var mesh Mesh
-	if data == nil {
-		mesh = Mesh{}
-	} else {
-		mesh = data.(Mesh)
-	}
-
-	gl.GenVertexArrays(1, &mesh.vao)
-	return mesh
+	Transform *Transform
 }
-func deleteMesh(component interface{}, entityId int) interface{} {
-	mesh := component.(Mesh)
-	unUsedVAOs = append(unUsedVAOs, mesh.vao)
-	return nil
+func NewMesh() *Mesh{
+	return &Mesh{Transform: NewTransform()}
 }
 
 func renderMeshes() {
-	entities := world.getAllEntityIdsWithComponent(ComponentMesh)
+	for _, mesh := range ActiveMeshesData.meshes {
 
-	for _, entityId := range entities {
-
-		mesh := GetComponent(entityId, ComponentMesh).(Mesh)
 		if len(mesh.instances) != 0 {
 			continue
 		}
@@ -63,12 +48,10 @@ func renderMeshes() {
 
 		if mesh.NeedsVertexUpdate {
 			pushVertexData(mesh)
-			setComponentInternal(entityId, ComponentMesh, mesh)
 		}
 
 		// Transform
-		transform := GetComponent(entityId, ComponentTransform).(Transform)
-		gl.UniformMatrix4fv(2, 1, false, &transform.matrix[0])
+		gl.UniformMatrix4fv(2, 1, false, &mesh.Transform.matrix[0])
 
 		// Color
 		gl.Uniform3f(3, mesh.Material.DiffuseColor[0], mesh.Material.DiffuseColor[1], mesh.Material.DiffuseColor[2])
@@ -78,11 +61,8 @@ func renderMeshes() {
 	}
 }
 func renderInstantMeshes() {
-	entities := world.getAllEntityIdsWithComponent(ComponentMesh)
+	for _, mesh := range ActiveMeshesData.meshes {
 
-	for _, entityId := range entities {
-
-		mesh := GetComponent(entityId, ComponentMesh).(Mesh)
 		if len(mesh.instances) == 0 {
 			continue
 		}
@@ -91,10 +71,9 @@ func renderInstantMeshes() {
 
 		if mesh.NeedsVertexUpdate {
 			pushVertexData(mesh)
-			setComponentInternal(entityId, ComponentMesh, mesh)
 		}
 
-		pushInstanceData(mesh, entityId)
+		pushInstanceData(mesh)
 
 		gl.DrawElementsInstanced(gl.TRIANGLES, int32(len(mesh.Indices)), gl.UNSIGNED_INT, nil, int32(len(mesh.instances)+1))
 	}
@@ -102,7 +81,7 @@ func renderInstantMeshes() {
 
 const vertexStride int32 = 3 * 4
 
-func pushVertexData(mesh Mesh) {
+func pushVertexData(mesh *Mesh) {
 	var vertexData []float32
 	for _, vertex := range mesh.Vertices {
 		vertexData = append(vertexData, []float32{
@@ -130,7 +109,7 @@ func pushVertexData(mesh Mesh) {
 
 const instanceStride int32 = 19 * 4
 
-func pushInstanceData(mesh Mesh, entityId int) {
+func pushInstanceData(mesh *Mesh) {
 	if mesh.needsInstanceUpdate {
 		// Instance VBO
 		gl.GenBuffers(1, &mesh.instanceVBO)
@@ -158,11 +137,10 @@ func pushInstanceData(mesh Mesh, entityId int) {
 		gl.VertexAttribDivisor(5, 1)
 
 		mesh.needsInstanceUpdate = false
-		SetComponent(entityId, ComponentMesh, mesh)
 	}
 
 	// Set Instance Data
-	transform := GetComponent(entityId, ComponentTransform).(Transform)
+	transform := mesh.Transform
 	var instanceData = []float32{
 		mesh.Material.DiffuseColor[0],
 		mesh.Material.DiffuseColor[1],
@@ -188,10 +166,8 @@ func pushInstanceData(mesh Mesh, entityId int) {
 		transform.matrix[14],
 		transform.matrix[15],
 	}
-	for _, id := range mesh.instances {
-		meshInstant := GetComponent(id, ComponentMeshInstant).(MeshInstant)
-		instantTransform := GetComponent(id, ComponentTransform).(Transform)
-
+	for _, meshInstant := range mesh.instances {
+		instantTransform := meshInstant.Transform
 		instanceData = append(instanceData, []float32{
 			meshInstant.Material.DiffuseColor[0],
 			meshInstant.Material.DiffuseColor[1],
@@ -289,62 +265,22 @@ func (mesh *Mesh) LoadOBJ(path string, loadMaterials bool) {
 	mesh.NeedsVertexUpdate = true
 }
 
-// MeshInstant is a Component that creates an Instant of the Mesh Component of MeshEntity.
-// Transform and Material are individual changeable.
-type MeshInstant struct {
-	MeshEntity int
-	Material   Material
-
-	ownEntity          int
-	currentlySetEntity int
+type activeMeshesData struct {
+	meshes []*Mesh
 }
+var ActiveMeshesData activeMeshesData
 
-func setUpMeshInstant(_ interface{}, entityId int) interface{} {
-	return MeshInstant{
-		ownEntity: entityId,
-	}
+func (a *activeMeshesData) AddMesh(mesh *Mesh){
+	gl.GenVertexArrays(1, &mesh.vao)
+	a.meshes = append(a.meshes, mesh)
 }
-func addMeshInstant(component interface{}, entityId int) interface{} {
-	meshInstant := component.(MeshInstant)
+func (a *activeMeshesData) RemoveMesh(mesh *Mesh){
 
-	if meshInstant.ownEntity == 0 || meshInstant.MeshEntity == 0 {
-		return component
-	}
-
-	if meshInstant.currentlySetEntity != meshInstant.MeshEntity {
-
-		if HasComponent(meshInstant.currentlySetEntity, ComponentMesh) {
-			mesh := GetComponent(meshInstant.currentlySetEntity, ComponentMesh).(Mesh)
-			mesh.removeMeshInstantFromMesh(meshInstant)
-			setComponentInternal(meshInstant.currentlySetEntity, ComponentMesh, mesh)
-		}
-
-		mesh := GetComponent(meshInstant.MeshEntity, ComponentMesh).(Mesh)
-		mesh.instances = append(mesh.instances, meshInstant.ownEntity)
-		mesh.needsInstanceUpdate = true
-		setComponentInternal(meshInstant.MeshEntity, ComponentMesh, mesh)
-
-		meshInstant.currentlySetEntity = meshInstant.MeshEntity
-	}
-
-	return meshInstant
-}
-func removeMeshInstant(component interface{}, entityId int) interface{} {
-	meshInstant := component.(MeshInstant)
-
-	if HasComponent(meshInstant.currentlySetEntity, ComponentMesh) {
-		mesh := GetComponent(meshInstant.currentlySetEntity, ComponentMesh).(Mesh)
-		mesh.removeMeshInstantFromMesh(meshInstant)
-		setComponentInternal(meshInstant.currentlySetEntity, ComponentMesh, mesh)
-	}
-
-	return meshInstant
-}
-
-func (mesh *Mesh) removeMeshInstantFromMesh(meshInstant MeshInstant) {
-	for i := len(mesh.instances); i > 0; i-- {
-		if mesh.instances[i] == meshInstant.currentlySetEntity {
-			mesh.instances = append(mesh.instances[:i], mesh.instances[i+1:]...)
+	for i := len(a.meshes) -1; i >= 0; i-- {
+		if a.meshes[i] == mesh {
+			a.meshes = append(a.meshes[:i], a.meshes[i+1:]...)
 		}
 	}
+
+	unUsedVAOs = append(unUsedVAOs, mesh.vao)
 }

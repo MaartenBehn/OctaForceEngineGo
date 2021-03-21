@@ -1,4 +1,4 @@
-package OctaForceEngine
+package V2
 
 import (
 	"github.com/go-gl/mathgl/mgl32"

@@ -1,4 +1,4 @@
-package OctaForceEngine
+package V2
 
 import "C"
 import (
@@ -12,8 +12,9 @@ const (
 )
 
 var window *glfw.Window
+var windowName string
 
-func setUpWindow(name string) {
+func initWindow() {
 	var err error
 
 	// Setting up Window
@@ -22,11 +23,20 @@ func setUpWindow(name string) {
 	glfw.WindowHint(glfw.ContextVersionMinor, 1)
 	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
 	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
-	window, err = glfw.CreateWindow(windowWidth, windowHeight, name, nil, nil)
+	window, err = glfw.CreateWindow(windowWidth, windowHeight, windowName, nil, nil)
 	if err != nil {
 		panic(err)
 	}
 	window.MakeContextCurrent()
+
+	task := NewTask(updateWindow)
+	task.SetRepeating(true)
+	AddTask(task)
+
+	task = NewTask(renderWindow)
+	task.SetRepeating(true)
+	task.SetWorker(workerRender)
+	AddTask(task)
 }
 
 func renderWindow() {
