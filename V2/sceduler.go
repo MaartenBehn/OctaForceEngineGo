@@ -1,85 +1,88 @@
 package V2
 
-import "sync"
-
-var tasks []*Task
-var freeTaskIds []int
+var repeatingTasks []*Task
+var repatingTaskChanged bool
+var oneTimeTasks []*Task
 
 func AddTask(task *Task) {
-	for _, testTask := range tasks {
-		if testTask == task {
-			return
-		}
-	}
-
-	globalChanges <- func() {
-		if len(freeTaskIds) > 0 {
-			task.id = freeTaskIds[0]
-			tasks[task.id] = task
-			freeTaskIds = freeTaskIds[1:]
+	workers[workerScedulerIn].(*taskWorker).addTask(func() {
+		if task.repeating {
+			repeatingTasks = append(repeatingTasks, task)
 		} else {
-			task.id = len(tasks)
-			tasks = append(tasks, task)
+			oneTimeTasks = append(oneTimeTasks, task)
 		}
-		updateTaskPlan()
-	}
-}
-func RemoveTask(task *Task) {
-	globalChanges <- func() {
-		tasks[task.id] = nil
-		freeTaskIds = append(freeTaskIds, task.id)
-		updateTaskPlan()
-	}
+		repatingTaskChanged = true
+	})
 }
 
-var taskPlan [][]*Task
+var repeatingPlan [][]*Task
+var oneTimePlan [][]*Task
 
-func updateTaskPlan() {
-	taskPlan = nil
-	for _, task := range tasks {
+func updatePlans() {
+	if repatingTaskChanged {
+		repatingTaskChanged = false
 
-		for i := 0; i < len(taskPlan); i++ {
-			fits := true
-			for j := 0; j < len(taskPlan[i]); j++ {
-				testTask := taskPlan[i][j]
-
-				for _, dataId := range task.writeData {
-					for _, testDataId := range testTask.readData {
-						if testDataId == dataId {
-							fits = false
-							break
-						}
-					}
-					for _, testDataId := range testTask.writeData {
-						if testDataId == dataId {
-							fits = false
-							break
-						}
-					}
+		repeatingPlan = nil
+		for _, task := range repeatingTasks {
+			for i := 0; i < len(repeatingPlan); i++ {
+				if doesTaskFitInPlan(i, task) {
+					repeatingPlan[i] = append(repeatingPlan[i], task)
 				}
 			}
+			repeatingPlan = append(repeatingPlan, []*Task{task})
+		}
+	}
 
-			if fits {
-				taskPlan[i] = append(taskPlan[i], task)
+	oneTimePlan = make([][]*Task, len(repeatingPlan))
+
+	for _, task := range oneTimeTasks {
+		for i := 0; i < len(repeatingPlan); i++ {
+			if doesTaskFitInPlan(i, task) {
+				oneTimePlan[i] = append(oneTimePlan[i], task)
 			}
 		}
-
-		taskPlan = append(taskPlan, []*Task{task})
+		oneTimePlan = append(oneTimePlan, []*Task{task})
 	}
+	oneTimeTasks = nil
+}
+func doesTaskFitInPlan(i int, task *Task) bool {
+	fits := true
+	for j := 0; j < len(repeatingPlan[i]); j++ {
+		testTask := repeatingPlan[i][j]
+
+		for _, data := range task.writeData {
+			for _, testdata := range testTask.writeData {
+				if data == testdata {
+					fits = false
+				}
+			}
+		}
+	}
+	return fits
 }
 
-func runPlan() {
-	for i := 0; i < len(taskPlan); i++ {
-
-		wg := sync.WaitGroup{}
-		for j := 0; j < len(taskPlan[i]); j++ {
-			wg.Add(1)
-			go func() {
-				taskPlan[i][j].function()
-				wg.Done()
-			}()
+func dispatchPlan() {
+	maxIndex := len(oneTimePlan)
+	for i := 0; i < maxIndex; i++ {
+		for _, task := range oneTimePlan[i] {
+			dispatchTask(task)
 		}
-		wg.Wait()
-		syncState()
+
+		if len(repeatingPlan) > i {
+			for _, task := range repeatingPlan[i] {
+				dispatchTask(task)
+			}
+		}
+	}
+}
+func dispatchTask(task *Task) {
+	added := false
+	for !added {
+		for _, worker := range taskWorkers {
+			if worker.tryAddTask(task.function) {
+				added = true
+				break
+			}
+		}
 	}
 }

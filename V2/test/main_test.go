@@ -1,12 +1,25 @@
 package test
 
-import "testing"
+import (
+	"log"
+	"testing"
+)
 import of "OctaForceEngineGo/V2"
 
 func TestOctaForce(t *testing.T) {
-	task := of.Task{}
-	task.SetReadData()
+	of.Init(start, stop, "Test")
+}
 
-	transform := of.Transform{}
-	transform.GetId()
+func start() {
+	i := 0
+	task := of.NewTask(func() {
+		log.Print(i)
+		i++
+	})
+	task.SetRepeating(true)
+	of.AddTask(task)
+}
+
+func stop() {
+
 }

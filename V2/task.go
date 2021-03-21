@@ -1,18 +1,25 @@
 package V2
 
 type Task struct {
-	id        int
-	readData  []int
-	writeData []int
 	function  func()
+	readData  []Data
+	writeData []Data
+	repeating bool
 }
 
-func (t *Task) SetReadData(data ...int) {
+func NewTask(function func()) *Task {
+	return &Task{
+		function:  function,
+		repeating: false,
+	}
+}
+
+func (t *Task) SetReadData(data ...Data) {
 	t.readData = data
 }
-func (t *Task) SetWriteData(data ...int) {
+func (t *Task) SetWriteData(data ...Data) {
 	t.writeData = data
 }
-func (t *Task) SetFunction(function func()) {
-	t.function = function
+func (t *Task) SetRepeating(repeating bool) {
+	t.repeating = repeating
 }

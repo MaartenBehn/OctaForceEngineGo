@@ -1,6 +1,10 @@
 package V2
 
-import "time"
+import (
+	"log"
+	"runtime"
+	"time"
+)
 
 var (
 	running bool
@@ -8,10 +12,20 @@ var (
 	Fps     float64
 )
 
-func Init() {
-	initChangesBuffer()
+func Init(gameStartFunc func(), gameStopFunc func(), name string) {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	runtime.LockOSThread()
+
+	MaxFPS = 1
+	running = true
+
+	initFixedWorkers()
+
+	gameStartFunc()
 
 	run()
+
+	gameStopFunc()
 }
 
 func run() {
@@ -22,8 +36,13 @@ func run() {
 	for running {
 		startDuration = time.Since(startTime)
 
-		runPlan()
-		applyChangeBuffer()
+		synceWorkers()
+
+		updatePlans()
+
+		releaseWorkers()
+
+		log.Print(Fps)
 
 		diff := time.Since(startTime) - startDuration
 		if diff > 0 {
