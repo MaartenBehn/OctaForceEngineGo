@@ -1,5 +1,10 @@
 package V2
 
+import (
+	"log"
+	"sync"
+)
+
 var repeatingTasks []*Task
 var repatingTaskChanged bool
 var oneTimeTasks []*Task
@@ -24,24 +29,33 @@ func updatePlans() {
 
 		repeatingPlan = nil
 		for _, task := range repeatingTasks {
+			fit := false
 			for i := 0; i < len(repeatingPlan); i++ {
 				if doesTaskFitInPlan(i, task) {
 					repeatingPlan[i] = append(repeatingPlan[i], task)
+					fit = true
 				}
 			}
-			repeatingPlan = append(repeatingPlan, []*Task{task})
+
+			if !fit {
+				repeatingPlan = append(repeatingPlan, []*Task{task})
+			}
 		}
 	}
 
 	oneTimePlan = make([][]*Task, len(repeatingPlan))
 
 	for _, task := range oneTimeTasks {
+		fit := false
 		for i := 0; i < len(repeatingPlan); i++ {
 			if doesTaskFitInPlan(i, task) {
 				oneTimePlan[i] = append(oneTimePlan[i], task)
+				fit = true
 			}
 		}
-		oneTimePlan = append(oneTimePlan, []*Task{task})
+		if !fit {
+			oneTimePlan = append(oneTimePlan, []*Task{task})
+		}
 	}
 	oneTimeTasks = nil
 }
@@ -61,25 +75,36 @@ func doesTaskFitInPlan(i int, task *Task) bool {
 	return fits
 }
 
+var wg = sync.WaitGroup{}
+
 func dispatchPlan() {
 	maxIndex := len(oneTimePlan)
 	for i := 0; i < maxIndex; i++ {
+		wg.Add(len(oneTimePlan[i]))
 		for _, task := range oneTimePlan[i] {
 			dispatchTask(task)
 		}
 
+		wg.Add(len(repeatingPlan[i]))
 		if len(repeatingPlan) > i {
 			for _, task := range repeatingPlan[i] {
 				dispatchTask(task)
 			}
 		}
+
+		wg.Wait()
 	}
+	_, fps := frameEnd()
+	log.Printf("%f \r", fps)
 }
 func dispatchTask(task *Task) {
 	added := false
 	for !added {
 		for _, worker := range taskWorkers {
-			if worker.tryAddTask(task.function) {
+			if worker.tryAddTask(func() {
+				task.function()
+				wg.Done()
+			}) {
 				added = true
 				break
 			}

@@ -1,9 +1,5 @@
 package V2
 
-import (
-	"log"
-)
-
 const (
 	workerTypNone = 0
 	workerTypTask = 1
@@ -38,7 +34,6 @@ func (w *worker) getTyp() int {
 }
 func (w *worker) run() {
 	for range w.syncChan {
-		log.Print("Worker synced")
 		<-w.syncDoneChan
 	}
 }
@@ -67,7 +62,6 @@ func (w *taskWorker) run() {
 		case task := <-w.tasksIn:
 			task()
 		case <-w.syncChan:
-			log.Print("Worker synced")
 			<-w.syncDoneChan
 		}
 	}
@@ -101,7 +95,6 @@ func (w *funcWorker) run() {
 		w.function()
 
 		<-w.syncChan
-		log.Print("Worker synced")
 		<-w.syncDoneChan
 	}
 
@@ -111,17 +104,26 @@ var workers []iworker
 var taskWorkers []*taskWorker
 
 const (
-	workerRender      = 0
+	workerScedulerOut = 0
 	workerScedulerIn  = 1
-	workerScedulerOut = 2
-	workerFixedMax    = 3
+	workerRender      = 2
+	workerState       = 3
+	workerFixedMax    = 4
 )
 
+var dynamicWorkerAmmount = 10
+
 func initFixedWorkers() {
-	workers = make([]iworker, workerFixedMax)
+	workers = make([]iworker, workerFixedMax+dynamicWorkerAmmount)
 
 	workers[workerScedulerIn] = newTaskWorker(true)
 	workers[workerScedulerOut] = newFuncWorker(true, dispatchPlan)
+
+	workers[workerState] = newTaskWorker(true)
+
+	for i := workerFixedMax; i < workerFixedMax+dynamicWorkerAmmount; i++ {
+		workers[i] = newTaskWorker(false)
+	}
 
 	for i, worker := range workers {
 		if worker == nil {
@@ -148,5 +150,4 @@ func releaseWorkers() {
 	for _, worker := range workers {
 		worker.syncDone()
 	}
-
 }
