@@ -29,6 +29,7 @@ type Mesh struct {
 
 	instanceVBO         uint32
 	instances           []*MeshInstant
+	instanceData        []float32
 	needsInstanceUpdate bool
 
 	Transform *Transform
@@ -138,12 +139,14 @@ func pushInstanceData(mesh *Mesh) {
 		gl.VertexAttribPointer(5, 4, gl.FLOAT, false, instanceStride, gl.PtrOffset(15*4))
 		gl.VertexAttribDivisor(5, 1)
 
+		mesh.instanceData = make([]float32, (1+len(mesh.instances))*19)
+
 		mesh.needsInstanceUpdate = false
 	}
 
 	// Set Instance Data
 	transform := mesh.Transform
-	instanceData := make([]float32, (1+len(mesh.instances))*19)
+	instanceData := mesh.instanceData
 
 	instanceData[0] = mesh.Material.DiffuseColor[0]
 	instanceData[1] = mesh.Material.DiffuseColor[1]
@@ -199,6 +202,7 @@ func pushInstanceData(mesh *Mesh) {
 		instanceData[index+17] = matrix[14]
 		instanceData[index+18] = matrix[15]
 	}
+	mesh.instanceData = instanceData
 
 	gl.BindBuffer(gl.ARRAY_BUFFER, mesh.instanceVBO)
 	gl.BufferData(gl.ARRAY_BUFFER, (len(mesh.instances)+1)*int(instanceStride), gl.Ptr(instanceData), gl.DYNAMIC_DRAW)

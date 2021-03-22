@@ -35,6 +35,18 @@ func start() {
 	mesh.Material = of.Material{DiffuseColor: [3]float32{1, 1, 1}}
 	of.ActiveMeshesData.AddMesh(mesh)
 
+	start := time.Now()
+	task := of.NewTask(func() {
+		sum := 0
+		for i := 0; i < int(time.Since(start).Milliseconds()); i++ {
+			sum += i
+		}
+	})
+	task.SetRepeating(true)
+	for i := 0; i < 400; i++ {
+		//of.AddTask(task)
+	}
+
 	for i := 0; i < 100; i++ {
 		var instants []*of.MeshInstant
 		for j := 0; j < 10000; j++ {
@@ -42,15 +54,20 @@ func start() {
 			meshInstant.Transform.SetPosition(mgl32.Vec3{float32(i) * 10, float32(j) * 10, 0})
 			instants = append(instants, meshInstant)
 		}
-		task := of.NewTask(func() {
-			z := float32(math.Sin(float64(time.Now().Second())))
-			for _, instant := range instants {
-				instant.Transform.MoveRelative(mgl32.Vec3{0, 0, z})
-			}
-		})
-		task.SetRepeating(true)
-		of.AddTask(task)
+
+		newTask(instants)
 	}
+}
+
+func newTask(instants []*of.MeshInstant) {
+	task := of.NewTask(func() {
+		z := float32(math.Sin(float64(time.Now().Second())))
+		for _, instant := range instants {
+			instant.Transform.MoveRelative(mgl32.Vec3{0, 0, z})
+		}
+	})
+	task.SetRepeating(true)
+	of.AddTask(task)
 }
 
 func stop() {

@@ -22,13 +22,9 @@
     <list default="true" id="3abefc9d-9325-4d28-b9c5-4a14d5d5f305" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dispatcher.go" beforeDir="false" afterPath="$PROJECT_DIR$/dispatcher.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mesh.go" beforeDir="false" afterPath="$PROJECT_DIR$/mesh.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/meshInstant.go" beforeDir="false" afterPath="$PROJECT_DIR$/meshInstant.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/render.go" beforeDir="false" afterPath="$PROJECT_DIR$/render.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/state.go" beforeDir="false" afterPath="$PROJECT_DIR$/state.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sceduler.go" beforeDir="false" afterPath="$PROJECT_DIR$/sceduler.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/test/main_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/transform.go" beforeDir="false" afterPath="$PROJECT_DIR$/transform.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/window.go" beforeDir="false" afterPath="$PROJECT_DIR$/window.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/worker.go" beforeDir="false" afterPath="$PROJECT_DIR$/worker.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -68,7 +64,18 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
   </component>
-  <component name="RunManager" selected="Go Test.TestOctaForce in OctaForceEngineGo/test">
+  <component name="RunManager" selected="Go Test.TestOctaForce in OctaForceEngineGo/test (1)">
+    <configuration name="TestOctaForce in OctaForceEngineGo/test (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="OctaForce" />
+      <working_directory value="$PROJECT_DIR$/test" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="OctaForceEngineGo/test" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <pattern value="^\QTestOctaForce\E$" />
+      <method v="2" />
+    </configuration>
     <configuration name="TestOctaForce in OctaForceEngineGo/test race" type="GoTestRunConfiguration" factoryName="Go Test">
       <module name="OctaForce" />
       <working_directory value="$PROJECT_DIR$/test" />
@@ -95,9 +102,11 @@
     <list>
       <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test race" />
       <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test" />
+      <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test (1)" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test (1)" />
         <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test" />
       </list>
     </recent_temporary>

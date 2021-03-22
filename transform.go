@@ -105,6 +105,5 @@ func (transform *Transform) updateMatrix() {
 	}
 }
 func (transform *Transform) getMatrix() mgl32.Mat4 {
-	transform.updateMatrix()
 	return transform.matrix
 }

@@ -52,6 +52,7 @@ func releaseWorkers() {
 }
 
 var workerTasks [][]*Task
+var workerWithTasks []int
 var tasks []*Task
 
 func copyTaskSlices() {
@@ -72,26 +73,35 @@ func copyTaskSlices() {
 			tasks = append(tasks, task)
 		}
 	}
+
+	for i := 0; i < workerFixedMax; i++ {
+		if len(workerTasks[i]) > 0 {
+			workerWithTasks = append(workerWithTasks, i)
+		}
+	}
+
 	oneTimeTasks = nil
 }
 
+var globalTasks = make(chan *Task, 1)
+
 func dispatchTasks() {
-	workerEmpti := false
-	for !workerEmpti || len(tasks) > 0 {
+	for len(workerWithTasks) > 0 || len(tasks) > 0 {
 
-		workerEmpti = true
-		for i, worker := range workers {
-			if i < workerFixedMax && len(workerTasks[i]) > 0 {
-				workerEmpti = false
-
-				if worker.tryAddTask(workerTasks[i][0].function) {
-					workerTasks[i] = workerTasks[i][1:]
-					continue
-				}
-			}
-
-			if len(tasks) > 0 && worker.tryAddTask(tasks[0].function) {
+		if len(tasks) > 0 {
+			select {
+			case globalTasks <- tasks[0]:
 				tasks = tasks[1:]
+			default:
+			}
+		}
+
+		for i := range workerWithTasks {
+			if workers[i].tryAddTask(workerTasks[i][0]) {
+				workerTasks[i] = workerTasks[i][1:]
+				if len(workerTasks[i]) == 0 {
+					workerWithTasks = append(workerWithTasks[:i], workerWithTasks[i+1:]...)
+				}
 			}
 		}
 	}

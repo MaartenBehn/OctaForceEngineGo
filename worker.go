@@ -7,14 +7,14 @@ const (
 )
 
 type worker struct {
-	tasks    chan func()
+	tasks    chan *Task
 	sync     chan bool
 	syncDone chan bool
 }
 
 func newWorker() *worker {
 	return &worker{
-		tasks:    make(chan func(), 10),
+		tasks:    make(chan *Task, 1),
 		sync:     make(chan bool),
 		syncDone: make(chan bool),
 	}
@@ -24,18 +24,20 @@ func (w *worker) run() {
 	for running {
 		select {
 		case task := <-w.tasks:
-			task()
+			task.function()
+		case task := <-globalTasks:
+			task.function()
 		case <-w.sync:
 			<-w.syncDone
 		}
 	}
 }
-func (w *worker) addTask(function func()) {
-	w.tasks <- function
+func (w *worker) addTask(task *Task) {
+	w.tasks <- task
 }
-func (w *worker) tryAddTask(function func()) bool {
+func (w *worker) tryAddTask(task *Task) bool {
 	select {
-	case w.tasks <- function:
+	case w.tasks <- task:
 		return true
 	default:
 		return false

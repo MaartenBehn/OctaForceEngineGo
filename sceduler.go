@@ -5,7 +5,7 @@ var repatingTaskChanged bool
 var oneTimeTasks []*Task
 
 func AddTask(task *Task) {
-	workers[workerSceduler].addTask(func() {
+	addTask := NewTask(func() {
 		if task.repeating {
 			repeatingTasks = append(repeatingTasks, task)
 		} else {
@@ -13,4 +13,5 @@ func AddTask(task *Task) {
 		}
 		repatingTaskChanged = true
 	})
+	workers[workerSceduler].addTask(addTask)
 }
