@@ -16,6 +16,9 @@ func initDispatcher() {
 	addTask = make(chan *Task, 1)
 	removeTask = make(chan *Task, 1)
 
+	updateTasksListSync = make(chan bool)
+	updateTasksListRelease = make(chan bool)
+
 	go updateTasksList()
 }
 
@@ -24,6 +27,12 @@ func runDispatcher() {
 
 	for running {
 		frameStart = time.Now()
+
+		updateTasksListSync <- true
+
+		copyTaskSlices()
+
+		updateTasksListRelease <- true
 
 		dispatchTasks()
 
@@ -55,19 +64,23 @@ func RemoveTask(task *Task) {
 }
 
 var repeatingTasks []*Task
-var repeatingTasksStarted []bool
 var oneTimeTasks []*Task
+var updateTasksListSync chan bool
+var updateTasksListRelease chan bool
 
 func updateTasksList() {
 	for running {
 		select {
+		case <-updateTasksListSync:
+			<-updateTasksListRelease
+
 		case task := <-addTask:
 			if task.repeating {
 				repeatingTasks = append(repeatingTasks, task)
-				repeatingTasksStarted = append(repeatingTasksStarted, false)
 			} else {
 				oneTimeTasks = append(oneTimeTasks, task)
 			}
+
 		case task := <-removeTask:
 			if !task.repeating {
 				break
@@ -76,12 +89,26 @@ func updateTasksList() {
 			for i, repeatingTask := range repeatingTasks {
 				if repeatingTask == task {
 					repeatingTasks = append(repeatingTasks[:i], repeatingTasks[i+1:]...)
-					repeatingTasksStarted = append(repeatingTasksStarted[:i], repeatingTasksStarted[i+1:]...)
 					break
 				}
 			}
 		}
 	}
+}
+
+var tasks []*Task
+
+func copyTaskSlices() {
+	tasks = nil
+
+	for _, task := range repeatingTasks {
+		tasks = append(tasks, task)
+	}
+
+	for _, task := range oneTimeTasks {
+		tasks = append(tasks, task)
+	}
+	oneTimeTasks = nil
 }
 
 var done bool
@@ -102,45 +129,32 @@ func dispatchTasks() {
 			}
 		}
 
-		for i := len(oneTimeTasks) - 1; i >= 0; i-- {
+		for i := len(tasks) - 1; i >= 0; i-- {
 			done = false
-			task := oneTimeTasks[i]
+			task := tasks[i]
 			if canStartTask(task) {
 				select {
 				case task.start <- true:
-					oneTimeTasks = append(oneTimeTasks[:i], oneTimeTasks[i+1:]...)
+					tasks = append(tasks[:i], tasks[i+1:]...)
 					aktiveTasks = append(aktiveTasks, task)
 				default:
 				}
 			}
 		}
-
-		for i, task := range repeatingTasks {
-			if !repeatingTasksStarted[i] && canStartTask(task) {
-				done = false
-				select {
-				case task.start <- true:
-					repeatingTasksStarted[i] = true
-					aktiveTasks = append(aktiveTasks, task)
-				default:
-				}
-			}
-		}
-	}
-
-	for i := range repeatingTasksStarted {
-		repeatingTasksStarted[i] = false
 	}
 }
 
 func canStartTask(task *Task) bool {
-	return true
 	for _, aktiveTask := range aktiveTasks {
-		for _, dependency := range aktiveTask.dependencies {
-			for _, data := range task.dependencies {
-				if data.checkDependency(dependency) {
-					return false
-				}
+		for _, raceTask := range task.raceTasks {
+			if aktiveTask == raceTask {
+				return false
+			}
+		}
+
+		for _, raceTask := range aktiveTask.raceTasks {
+			if task == raceTask {
+				return false
 			}
 		}
 	}

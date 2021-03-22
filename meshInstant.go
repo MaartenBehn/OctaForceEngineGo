@@ -20,10 +20,6 @@ func NewMeshInstant(mesh *Mesh, material *Material) *MeshInstant {
 	return meshInstant
 }
 
-func (m *MeshInstant) checkDependency(data Data) bool {
-	return m == data.(*MeshInstant)
-}
-
 func (m *MeshInstant) Delete() {
 	mesh := m.mesh
 	for i := len(mesh.instances) - 1; i >= 0; i-- {

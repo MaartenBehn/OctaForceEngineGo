@@ -24,19 +24,14 @@
       <change beforePath="$PROJECT_DIR$/camera.go" beforeDir="false" afterPath="$PROJECT_DIR$/camera.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dispatcher.go" beforeDir="false" afterPath="$PROJECT_DIR$/dispatcher.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/material.go" beforeDir="false" afterPath="$PROJECT_DIR$/material.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mesh.go" beforeDir="false" afterPath="$PROJECT_DIR$/mesh.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/meshInstant.go" beforeDir="false" afterPath="$PROJECT_DIR$/meshInstant.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/render.go" beforeDir="false" afterPath="$PROJECT_DIR$/render.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sceduler.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shader.go" beforeDir="false" afterPath="$PROJECT_DIR$/shader.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/state.go" beforeDir="false" afterPath="$PROJECT_DIR$/state.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/task.go" beforeDir="false" afterPath="$PROJECT_DIR$/task.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/test/main_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/transform.go" beforeDir="false" afterPath="$PROJECT_DIR$/transform.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utility.go" beforeDir="false" afterPath="$PROJECT_DIR$/utility.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/window.go" beforeDir="false" afterPath="$PROJECT_DIR$/window.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker.go" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,6 +47,11 @@
   </component>
   <component name="GOROOT" url="file://C:/Program Files/Go" />
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="288e8c7ed584c9ef9b2f7dd73251311651f29c4f" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1hK3FjOMhoG7NPL5SqDr5s0UQxI" />
@@ -74,29 +74,7 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
   </component>
-  <component name="RunManager" selected="Go Test.TestOctaForce in OctaForceEngineGo/test (2)">
-    <configuration name="TestOctaForce in OctaForceEngineGo/test (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="OctaForce" />
-      <working_directory value="$PROJECT_DIR$/test" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="OctaForceEngineGo/test" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <pattern value="^\QTestOctaForce\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestOctaForce in OctaForceEngineGo/test (2)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="OctaForce" />
-      <working_directory value="$PROJECT_DIR$/test" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="OctaForceEngineGo/test" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <pattern value="^\QTestOctaForce\E$" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Go Test.TestOctaForce in OctaForceEngineGo/test">
     <configuration name="TestOctaForce in OctaForceEngineGo/test race" type="GoTestRunConfiguration" factoryName="Go Test">
       <module name="OctaForce" />
       <working_directory value="$PROJECT_DIR$/test" />
@@ -123,13 +101,9 @@
     <list>
       <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test race" />
       <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test" />
-      <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test (1)" />
-      <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test (2)" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test (2)" />
-        <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test (1)" />
         <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test" />
       </list>
     </recent_temporary>
@@ -155,21 +129,5 @@
     <MESSAGE value="Performance inprovements" />
     <MESSAGE value="new Idea" />
     <option name="LAST_COMMIT_MESSAGE" value="new Idea" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/dispatcher.go</url>
-          <line>86</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/dispatcher.go</url>
-          <line>90</line>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

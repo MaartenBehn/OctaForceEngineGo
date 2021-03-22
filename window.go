@@ -29,9 +29,9 @@ func initWindow() {
 	}
 	window.MakeContextCurrent()
 
-	task := NewTask(updateWindow)
-	task.SetRepeating(true)
-	AddTask(task)
+	*engineTasks[WindowUpdateTask] = *NewTask(updateWindow)
+	engineTasks[WindowUpdateTask].SetRepeating(true)
+	AddTask(engineTasks[WindowUpdateTask])
 }
 
 func renderWindow() {

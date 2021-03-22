@@ -25,7 +25,7 @@ func TestOctaForce(t *testing.T) {
 func start() {
 	camera := of.NewCamera()
 	camera.Transform = of.NewTransform()
-	camera.Transform.SetPosition(mgl32.Vec3{1000, 1000, 2000})
+	camera.Transform.SetPosition(mgl32.Vec3{0, 0, 2000})
 
 	of.ActiveCamera = camera
 
@@ -46,9 +46,9 @@ func start() {
 		//of.AddTask(task)
 	}
 
-	for i := 0; i < 20000; i++ {
+	for i := 0; i < 100; i++ {
 		var instants []*of.MeshInstant
-		for j := 0; j < 50; j++ {
+		for j := 0; j < 10000; j++ {
 			meshInstant := of.NewMeshInstant(mesh, &of.Material{DiffuseColor: [3]float32{1, 0, 1}})
 			meshInstant.Transform.SetPosition(mgl32.Vec3{float32(i) * 10, float32(j) * 10, 0})
 			instants = append(instants, meshInstant)
@@ -70,7 +70,7 @@ func newTask(instants []*of.MeshInstant) {
 	for i, instant := range instants {
 		dependices[i] = instant
 	}
-	task.SetDependencies(dependices...)
+	task.SetRaceTask(of.GetEngineTask(of.RenderTask))
 	of.AddTask(task)
 }
 

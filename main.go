@@ -27,9 +27,9 @@ func Init(gameStartFunc func(), gameStopFunc func(), name string) {
 	}
 	defer glfw.Terminate()
 
+	initState()
 	initActiveMeshesData()
 	initActiveCamera()
-
 	initDispatcher()
 	initWindow()
 	initRenderer()

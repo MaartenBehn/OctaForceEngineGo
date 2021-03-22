@@ -1,11 +1,11 @@
 package OctaForce
 
 type Task struct {
-	function     func()
-	repeating    bool
-	start        chan bool
-	done         chan bool
-	dependencies []Data
+	function  func()
+	repeating bool
+	start     chan bool
+	done      chan bool
+	raceTasks []*Task
 }
 
 func NewTask(function func()) *Task {
@@ -20,8 +20,8 @@ func NewTask(function func()) *Task {
 func (t *Task) SetRepeating(repeating bool) {
 	t.repeating = repeating
 }
-func (t *Task) SetDependencies(dependencies ...Data) {
-	t.dependencies = dependencies
+func (t *Task) SetRaceTask(tasks ...*Task) {
+	t.raceTasks = tasks
 }
 func (t *Task) run() {
 	for running {

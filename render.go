@@ -89,15 +89,14 @@ func initRenderer() {
 }
 
 func runRender() {
-	task := NewTask(func() {
+	*engineTasks[RenderTask] = *NewTask(func() {
 		renderRenderer()
 		renderWindow()
 		printGlErrors()
 	})
-	task.SetRepeating(true)
-	task.SetDependencies(ActiveMeshesData, ActiveCamera)
-	addTask <- task
-	task.run()
+	engineTasks[RenderTask].SetRepeating(true)
+	addTask <- engineTasks[RenderTask]
+	engineTasks[RenderTask].run()
 }
 
 func renderRenderer() {

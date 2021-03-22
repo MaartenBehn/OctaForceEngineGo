@@ -27,87 +27,83 @@ func NewTransform() *Transform {
 	transform.updateMatrix()
 	return transform
 }
-func (transform *Transform) GetPosition() mgl32.Vec3 {
-	return transform.position
+func (t *Transform) GetPosition() mgl32.Vec3 {
+	return t.position
 }
-func (transform *Transform) SetPosition(position mgl32.Vec3) {
-	transform.position = position
-	transform.needsMatrixUpdate = true
-	transform.updateMatrix()
+func (t *Transform) SetPosition(position mgl32.Vec3) {
+	t.position = position
+	t.needsMatrixUpdate = true
+	t.updateMatrix()
 }
-func (transform *Transform) MoveRelative(vec3 mgl32.Vec3) {
-	if transform.rotation[0] != 0 && transform.rotation[1] != 0 && transform.rotation[2] != 0 {
-		vec3 = mgl32.TransformCoordinate(vec3, transform.getRotateMatrix())
+func (t *Transform) MoveRelative(vec3 mgl32.Vec3) {
+	if t.rotation[0] != 0 && t.rotation[1] != 0 && t.rotation[2] != 0 {
+		vec3 = mgl32.TransformCoordinate(vec3, t.getRotateMatrix())
 	}
 
-	transform.position = mgl32.Vec3{
-		transform.position[0] + vec3[0],
-		transform.position[1] + vec3[1],
-		transform.position[2] + vec3[2]}
+	t.position = mgl32.Vec3{
+		t.position[0] + vec3[0],
+		t.position[1] + vec3[1],
+		t.position[2] + vec3[2]}
 
-	transform.needsMatrixUpdate = true
-	transform.updateMatrix()
+	t.needsMatrixUpdate = true
+	t.updateMatrix()
 }
-func (transform *Transform) GetRotation() mgl32.Vec3 {
+func (t *Transform) GetRotation() mgl32.Vec3 {
 	return mgl32.Vec3{
-		mgl32.RadToDeg(transform.rotation[0]),
-		mgl32.RadToDeg(transform.rotation[1]),
-		mgl32.RadToDeg(transform.rotation[2])}
+		mgl32.RadToDeg(t.rotation[0]),
+		mgl32.RadToDeg(t.rotation[1]),
+		mgl32.RadToDeg(t.rotation[2])}
 }
-func (transform *Transform) SetRotaion(vec3 mgl32.Vec3) {
-	transform.rotation = mgl32.Vec3{
+func (t *Transform) SetRotaion(vec3 mgl32.Vec3) {
+	t.rotation = mgl32.Vec3{
 		mgl32.DegToRad(vec3[0]),
 		mgl32.DegToRad(vec3[1]),
 		mgl32.DegToRad(vec3[2])}
-	transform.needsRotateMatrixUpdate = true
-	transform.updateMatrix()
+	t.needsRotateMatrixUpdate = true
+	t.updateMatrix()
 }
-func (transform *Transform) Rotate(vec3 mgl32.Vec3) {
-	transform.rotation = mgl32.Vec3{
-		transform.rotation.X() + mgl32.DegToRad(vec3.X()),
-		transform.rotation.Y() + mgl32.DegToRad(vec3.Y()),
-		transform.rotation.Z() + mgl32.DegToRad(vec3.Z())}
-	transform.needsRotateMatrixUpdate = true
-	transform.updateMatrix()
+func (t *Transform) Rotate(vec3 mgl32.Vec3) {
+	t.rotation = mgl32.Vec3{
+		t.rotation.X() + mgl32.DegToRad(vec3.X()),
+		t.rotation.Y() + mgl32.DegToRad(vec3.Y()),
+		t.rotation.Z() + mgl32.DegToRad(vec3.Z())}
+	t.needsRotateMatrixUpdate = true
+	t.updateMatrix()
 }
 
-func (transform *Transform) updateRotationMatrix() {
-	if transform.needsRotateMatrixUpdate {
-		transform.rotationMatrix = mgl32.Ident4()
+func (t *Transform) updateRotationMatrix() {
+	if t.needsRotateMatrixUpdate {
+		t.rotationMatrix = mgl32.Ident4()
 
-		transform.rotationMatrix = transform.rotationMatrix.Mul4(mgl32.HomogRotate3D(
-			transform.rotation.Y(), mgl32.Vec3{0, 1, 0}))
+		t.rotationMatrix = t.rotationMatrix.Mul4(mgl32.HomogRotate3D(
+			t.rotation.Y(), mgl32.Vec3{0, 1, 0}))
 
-		transform.rotationMatrix = transform.rotationMatrix.Mul4(mgl32.HomogRotate3D(
-			transform.rotation.X(), mgl32.Vec3{1, 0, 0}))
+		t.rotationMatrix = t.rotationMatrix.Mul4(mgl32.HomogRotate3D(
+			t.rotation.X(), mgl32.Vec3{1, 0, 0}))
 
-		transform.rotationMatrix = transform.rotationMatrix.Mul4(mgl32.HomogRotate3D(
-			transform.rotation.Z(), mgl32.Vec3{0, 0, 1}))
+		t.rotationMatrix = t.rotationMatrix.Mul4(mgl32.HomogRotate3D(
+			t.rotation.Z(), mgl32.Vec3{0, 0, 1}))
 
-		transform.needsRotateMatrixUpdate = false
+		t.needsRotateMatrixUpdate = false
 	}
 }
-func (transform *Transform) getRotateMatrix() mgl32.Mat4 {
-	transform.updateRotationMatrix()
-	return transform.rotationMatrix
+func (t *Transform) getRotateMatrix() mgl32.Mat4 {
+	t.updateRotationMatrix()
+	return t.rotationMatrix
 }
 
-func (transform *Transform) updateMatrix() {
-	if transform.needsMatrixUpdate {
-		transform.matrix = mgl32.Translate3D(
-			transform.position.X(),
-			transform.position.Y(),
-			transform.position.Z())
+func (t *Transform) updateMatrix() {
+	if t.needsMatrixUpdate {
+		t.matrix = mgl32.Translate3D(
+			t.position.X(),
+			t.position.Y(),
+			t.position.Z())
 
-		transform.matrix = transform.matrix.Mul4(transform.getRotateMatrix())
+		t.matrix = t.matrix.Mul4(t.getRotateMatrix())
 
-		transform.needsMatrixUpdate = false
+		t.needsMatrixUpdate = false
 	}
 }
-func (transform *Transform) getMatrix() mgl32.Mat4 {
-	return transform.matrix
-}
-
-func (transform *Transform) checkDependency(data Data) bool {
-	return transform == data
+func (t *Transform) getMatrix() mgl32.Mat4 {
+	return t.matrix
 }

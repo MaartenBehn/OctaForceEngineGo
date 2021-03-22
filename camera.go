@@ -15,9 +15,6 @@ func NewCamera() *Camera {
 			100000.0),
 	}
 }
-func (c *Camera) checkDependency(data Data) bool {
-	return c == data || data == ActiveCamera
-}
 
 func initActiveCamera() {
 	ActiveCamera = NewCamera()

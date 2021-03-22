@@ -38,9 +38,6 @@ type Mesh struct {
 func NewMesh() *Mesh {
 	return &Mesh{Transform: NewTransform()}
 }
-func (m *Mesh) checkDependency(data Data) bool {
-	return m == data
-}
 
 func renderMeshes() {
 	for _, mesh := range ActiveMeshesData.meshes {
@@ -212,7 +209,7 @@ func pushInstanceData(mesh *Mesh) {
 }
 
 // LoadOBJ returns the mesh struct of the given OBJ file.
-func (mesh *Mesh) LoadOBJ(path string, loadMaterials bool) {
+func (m *Mesh) LoadOBJ(path string, loadMaterials bool) {
 
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -261,20 +258,20 @@ func (mesh *Mesh) LoadOBJ(path string, loadMaterials bool) {
 		}
 	}
 
-	mesh.Vertices = make([]vertex, len(vertices))
-	mesh.Material = material
+	m.Vertices = make([]vertex, len(vertices))
+	m.Material = material
 	for _, face := range faces {
 		for _, values := range face {
 			vertexIndex := values[0] - 1
-			mesh.Indices = append(mesh.Indices, vertexIndex)
+			m.Indices = append(m.Indices, vertexIndex)
 			//goland:noinspection GoNilness
-			mesh.Vertices[vertexIndex].Position = vertices[vertexIndex]
+			m.Vertices[vertexIndex].Position = vertices[vertexIndex]
 			//mesh.Vertices[vertexIndex].UVCord = uvCord[values[1] -1]
 			//mesh.Vertices[vertexIndex].Normal = normals[values[2] -1]
 		}
 	}
 
-	mesh.NeedsVertexUpdate = true
+	m.NeedsVertexUpdate = true
 }
 
 type activeMeshesData struct {
@@ -300,7 +297,4 @@ func (a *activeMeshesData) RemoveMesh(mesh *Mesh) {
 	}
 
 	unUsedVAOs = append(unUsedVAOs, mesh.vao)
-}
-func (a *activeMeshesData) checkDependency(data Data) bool {
-	return a == data
 }
