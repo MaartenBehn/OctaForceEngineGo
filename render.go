@@ -38,21 +38,21 @@ func initRenderer() {
 	programmDatas[0] = programmData{
 		vertexPath:   "/shader/vertexShader.shader",
 		fragmentPath: "/shader/fragmentShader.shader",
-		renderFunc: renderMeshes,
+		renderFunc:   renderMeshes,
 	}
 	programmDatas[1] = programmData{
 		vertexPath:   "/shader/vertexShaderInstancing.shader",
 		fragmentPath: "/shader/fragmentShader.shader",
-		renderFunc: renderInstantMeshes,
+		renderFunc:   renderInstantMeshes,
 	}
 
 	for i, programmData := range programmDatas {
 		// Configure the vertex and fragment shaders
-		vertexShader, err := compileShader(absPath + programmData.vertexPath, gl.VERTEX_SHADER)
+		vertexShader, err := compileShader(absPath+programmData.vertexPath, gl.VERTEX_SHADER)
 		if err != nil {
 			panic(err)
 		}
-		fragmentShader, err := compileShader(absPath + programmData.fragmentPath, gl.FRAGMENT_SHADER)
+		fragmentShader, err := compileShader(absPath+programmData.fragmentPath, gl.FRAGMENT_SHADER)
 		if err != nil {
 			panic(err)
 		}
@@ -104,9 +104,8 @@ func renderRenderer() {
 	for _, programmData := range programmDatas {
 		gl.UseProgram(programmData.id)
 
-
 		// Creating inverted Camera pos
-		view := ActiveCameraData.Camera.Transform.matrix.Inv()
+		view := ActiveCameraData.Camera.Transform.getMatrix().Inv()
 		gl.UniformMatrix4fv(1, 1, false, &view[0])
 		gl.UniformMatrix4fv(0, 1, false, &ActiveCameraData.Camera.projection[0])
 

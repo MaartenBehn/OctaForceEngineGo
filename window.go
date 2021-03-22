@@ -211,7 +211,7 @@ func GetMousePos() mgl32.Vec2 {
 
 var mouseMovement mgl32.Vec2
 
-// GetMouseMovement returns the relative movement since the update.
+// GetMouseMovement returns the relative movement since the updateMatrix.
 func GetMouseMovement() mgl32.Vec2 {
 	return mouseMovement
 }

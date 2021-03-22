@@ -33,7 +33,8 @@ type Mesh struct {
 
 	Transform *Transform
 }
-func NewMesh() *Mesh{
+
+func NewMesh() *Mesh {
 	return &Mesh{Transform: NewTransform()}
 }
 
@@ -50,8 +51,9 @@ func renderMeshes() {
 			pushVertexData(mesh)
 		}
 
+		matrix := mesh.Transform.getMatrix()
 		// Transform
-		gl.UniformMatrix4fv(2, 1, false, &mesh.Transform.matrix[0])
+		gl.UniformMatrix4fv(2, 1, false, &matrix[0])
 
 		// Color
 		gl.Uniform3f(3, mesh.Material.DiffuseColor[0], mesh.Material.DiffuseColor[1], mesh.Material.DiffuseColor[2])
@@ -141,58 +143,61 @@ func pushInstanceData(mesh *Mesh) {
 
 	// Set Instance Data
 	transform := mesh.Transform
-	var instanceData = []float32{
-		mesh.Material.DiffuseColor[0],
-		mesh.Material.DiffuseColor[1],
-		mesh.Material.DiffuseColor[2],
+	instanceData := make([]float32, (1+len(mesh.instances))*19)
 
-		transform.matrix[0],
-		transform.matrix[1],
-		transform.matrix[2],
-		transform.matrix[3],
+	instanceData[0] = mesh.Material.DiffuseColor[0]
+	instanceData[1] = mesh.Material.DiffuseColor[1]
+	instanceData[2] = mesh.Material.DiffuseColor[2]
 
-		transform.matrix[4],
-		transform.matrix[5],
-		transform.matrix[6],
-		transform.matrix[7],
+	matrix := transform.getMatrix()
+	instanceData[3] = matrix[0]
+	instanceData[4] = matrix[1]
+	instanceData[5] = matrix[2]
+	instanceData[6] = matrix[3]
 
-		transform.matrix[8],
-		transform.matrix[9],
-		transform.matrix[10],
-		transform.matrix[11],
+	instanceData[7] = matrix[4]
+	instanceData[8] = matrix[5]
+	instanceData[9] = matrix[6]
+	instanceData[10] = matrix[7]
 
-		transform.matrix[12],
-		transform.matrix[13],
-		transform.matrix[14],
-		transform.matrix[15],
-	}
-	for _, meshInstant := range mesh.instances {
+	instanceData[11] = matrix[8]
+	instanceData[12] = matrix[9]
+	instanceData[13] = matrix[10]
+	instanceData[14] = matrix[11]
+
+	instanceData[15] = matrix[12]
+	instanceData[16] = matrix[13]
+	instanceData[17] = matrix[14]
+	instanceData[18] = matrix[15]
+
+	for i, meshInstant := range mesh.instances {
 		instantTransform := meshInstant.Transform
-		instanceData = append(instanceData, []float32{
-			meshInstant.Material.DiffuseColor[0],
-			meshInstant.Material.DiffuseColor[1],
-			meshInstant.Material.DiffuseColor[2],
+		index := (1 + i) * 19
 
-			instantTransform.matrix[0],
-			instantTransform.matrix[1],
-			instantTransform.matrix[2],
-			instantTransform.matrix[3],
+		instanceData[index] = meshInstant.Material.DiffuseColor[0]
+		instanceData[index+1] = meshInstant.Material.DiffuseColor[1]
+		instanceData[index+2] = meshInstant.Material.DiffuseColor[2]
 
-			instantTransform.matrix[4],
-			instantTransform.matrix[5],
-			instantTransform.matrix[6],
-			instantTransform.matrix[7],
+		matrix = instantTransform.getMatrix()
+		instanceData[index+3] = matrix[0]
+		instanceData[index+4] = matrix[1]
+		instanceData[index+5] = matrix[2]
+		instanceData[index+6] = matrix[3]
 
-			instantTransform.matrix[8],
-			instantTransform.matrix[9],
-			instantTransform.matrix[10],
-			instantTransform.matrix[11],
+		instanceData[index+7] = matrix[4]
+		instanceData[index+8] = matrix[5]
+		instanceData[index+9] = matrix[6]
+		instanceData[index+10] = matrix[7]
 
-			instantTransform.matrix[12],
-			instantTransform.matrix[13],
-			instantTransform.matrix[14],
-			instantTransform.matrix[15],
-		}...)
+		instanceData[index+11] = matrix[8]
+		instanceData[index+12] = matrix[9]
+		instanceData[index+13] = matrix[10]
+		instanceData[index+14] = matrix[11]
+
+		instanceData[index+15] = matrix[12]
+		instanceData[index+16] = matrix[13]
+		instanceData[index+17] = matrix[14]
+		instanceData[index+18] = matrix[15]
 	}
 
 	gl.BindBuffer(gl.ARRAY_BUFFER, mesh.instanceVBO)
@@ -268,15 +273,16 @@ func (mesh *Mesh) LoadOBJ(path string, loadMaterials bool) {
 type activeMeshesData struct {
 	meshes []*Mesh
 }
+
 var ActiveMeshesData activeMeshesData
 
-func (a *activeMeshesData) AddMesh(mesh *Mesh){
+func (a *activeMeshesData) AddMesh(mesh *Mesh) {
 	gl.GenVertexArrays(1, &mesh.vao)
 	a.meshes = append(a.meshes, mesh)
 }
-func (a *activeMeshesData) RemoveMesh(mesh *Mesh){
+func (a *activeMeshesData) RemoveMesh(mesh *Mesh) {
 
-	for i := len(a.meshes) -1; i >= 0; i-- {
+	for i := len(a.meshes) - 1; i >= 0; i-- {
 		if a.meshes[i] == mesh {
 			a.meshes = append(a.meshes[:i], a.meshes[i+1:]...)
 		}

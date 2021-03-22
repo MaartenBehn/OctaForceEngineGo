@@ -2,7 +2,7 @@ package test
 
 import (
 	"github.com/go-gl/mathgl/mgl32"
-	"github.com/pkg/profile"
+	"log"
 	"math"
 	"path/filepath"
 	"runtime"
@@ -19,7 +19,7 @@ func init() {
 }
 
 func TestOctaForce(t *testing.T) {
-	defer profile.Start().Stop()
+	//defer profile.Start().Stop()
 	of.Init(start, stop, "Test")
 }
 
@@ -35,24 +35,41 @@ func start() {
 	mesh.Material = of.Material{DiffuseColor: [3]float32{1, 1, 1}}
 	of.ActiveMeshesData.AddMesh(mesh)
 
-	for i := 0; i < 200; i++ {
+	for i := 0; i < 100; i++ {
 		var instants []*of.MeshInstant
-		for j := 0; j < 1000; j++ {
+		for j := 0; j < 10000; j++ {
 			meshInstant := of.NewMeshInstant(mesh, &of.Material{DiffuseColor: [3]float32{1, 0, 1}})
 			meshInstant.Transform.SetPosition(mgl32.Vec3{float32(i) * 10, float32(j) * 10, 0})
 			instants = append(instants, meshInstant)
 		}
 		task := of.NewTask(func() {
+			z := float32(math.Sin(float64(time.Now().Second())))
 			for _, instant := range instants {
-				instant.Transform.MoveRelative(mgl32.Vec3{0, 0, float32(math.Sin(float64(time.Now().Second())))})
+				instant.Transform.MoveRelative(mgl32.Vec3{0, 0, z})
 			}
 		})
 		task.SetRepeating(true)
 		of.AddTask(task)
 	}
-
 }
 
 func stop() {
 
+}
+
+var globalInt int
+
+func TestGoRotine(t *testing.T) {
+
+	for i := 0; i < 100; i++ {
+		go multiFunc(i)
+	}
+	multiFunc(101)
+
+}
+func multiFunc(id int) {
+	for {
+		globalInt++
+		log.Printf("%d %d", id, globalInt)
+	}
 }

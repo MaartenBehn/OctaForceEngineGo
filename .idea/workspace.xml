@@ -21,9 +21,15 @@
   <component name="ChangeListManager">
     <list default="true" id="3abefc9d-9325-4d28-b9c5-4a14d5d5f305" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Main.go" beforeDir="false" afterPath="$PROJECT_DIR$/Main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OctaForce.go" beforeDir="false" afterPath="$PROJECT_DIR$/OctaForce.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Window.go" beforeDir="false" afterPath="$PROJECT_DIR$/Window.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dispatcher.go" beforeDir="false" afterPath="$PROJECT_DIR$/dispatcher.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mesh.go" beforeDir="false" afterPath="$PROJECT_DIR$/mesh.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/meshInstant.go" beforeDir="false" afterPath="$PROJECT_DIR$/meshInstant.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/render.go" beforeDir="false" afterPath="$PROJECT_DIR$/render.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/state.go" beforeDir="false" afterPath="$PROJECT_DIR$/state.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/test/main_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/transform.go" beforeDir="false" afterPath="$PROJECT_DIR$/transform.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/window.go" beforeDir="false" afterPath="$PROJECT_DIR$/window.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/worker.go" beforeDir="false" afterPath="$PROJECT_DIR$/worker.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,7 +43,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="$PROJECT_DIR$/../../../../Programms/Program Files/Go" />
+  <component name="GOROOT" url="file://C:/Program Files/Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -54,7 +60,47 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+  </component>
+  <component name="RunManager" selected="Go Test.TestOctaForce in OctaForceEngineGo/test">
+    <configuration name="TestOctaForce in OctaForceEngineGo/test race" type="GoTestRunConfiguration" factoryName="Go Test">
+      <module name="OctaForce" />
+      <working_directory value="$PROJECT_DIR$/test" />
+      <go_parameters value="-race" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="OctaForceEngineGo/test" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <pattern value="^\QTestOctaForce\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestOctaForce in OctaForceEngineGo/test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="OctaForce" />
+      <working_directory value="$PROJECT_DIR$/test" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="OctaForceEngineGo/test" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <pattern value="^\QTestOctaForce\E$" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test race" />
+      <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TypeScriptGeneratedFilesManager">
@@ -75,15 +121,5 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="FPS and UPS system" />
     <option name="LAST_COMMIT_MESSAGE" value="FPS and UPS system" />
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1599771688254">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1599771688254" />
-    <state x="1920" y="0" width="1414" height="1027" key="dock-window-1" timestamp="1599774561666">
-      <screen x="1920" y="0" width="1920" height="1040" />
-    </state>
-    <state x="1920" y="0" width="1414" height="1027" key="dock-window-1/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1599774561666" />
   </component>
 </project>

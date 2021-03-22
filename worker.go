@@ -14,7 +14,7 @@ type worker struct {
 
 func newWorker() *worker {
 	return &worker{
-		tasks:    make(chan func(), 1),
+		tasks:    make(chan func(), 10),
 		sync:     make(chan bool),
 		syncDone: make(chan bool),
 	}
@@ -30,10 +30,10 @@ func (w *worker) run() {
 		}
 	}
 }
-func (w *worker) addTask(function func()){
+func (w *worker) addTask(function func()) {
 	w.tasks <- function
 }
-func (w *worker) tryAddTask(function func()) bool{
+func (w *worker) tryAddTask(function func()) bool {
 	select {
 	case w.tasks <- function:
 		return true
@@ -43,23 +43,26 @@ func (w *worker) tryAddTask(function func()) bool{
 }
 
 const (
-	workerRender = 0
+	workerRender   = 0
 	workerSceduler = 1
 	workerFixedMax = 2
 )
+
 var (
-	workers []*worker
-	dynamicWorkerAmmount = 5
+	workers              []*worker
+	dynamicWorkerAmmount = 9
 )
 
 func initWorkers() {
-	workers = make([]*worker, workerFixedMax + dynamicWorkerAmmount)
+	workers = make([]*worker, workerFixedMax+dynamicWorkerAmmount)
 
 	for i, worker := range workers {
 		worker = newWorker()
 		workers[i] = worker
 
-		if i == workerRender {continue}
+		if i == workerRender {
+			continue
+		}
 		go worker.run()
 	}
 }

@@ -1,7 +1,5 @@
 package V2
 
 type Data interface {
+	Delete()
 }
-
-var datas []Data
-var freeDataIds []int

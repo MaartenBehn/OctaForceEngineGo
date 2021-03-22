@@ -5,27 +5,19 @@ import (
 	"time"
 )
 
-var(
+var (
 	running    bool
-	FPS float64
-	MaxFPS float64
+	FPS        float64
+	MaxFPS     float64
 	frameStart time.Time
 )
 
-func runDispatcher(){
+func runDispatcher() {
 	wait := time.Duration(1.0 / MaxFPS * 1000000000)
 
+	//syncWorkers()
+	frameStart = time.Now()
 	for running {
-		frameStart = time.Now()
-
-		syncWorkers()
-
-		copyTaskSlices()
-
-		releaseWorkers()
-
-		dispatchTasks()
-
 		diff := time.Since(frameStart)
 		if diff > 0 {
 			FPS = (wait.Seconds() / diff.Seconds()) * MaxFPS
@@ -37,6 +29,14 @@ func runDispatcher(){
 		if diff < wait {
 			time.Sleep(wait - diff)
 		}
+		frameStart = time.Now()
+
+		copyTaskSlices()
+		//releaseWorkers()
+
+		dispatchTasks()
+
+		//syncWorkers()
 	}
 }
 
@@ -53,13 +53,14 @@ func releaseWorkers() {
 
 var workerTasks [][]*Task
 var tasks []*Task
-func copyTaskSlices(){
+
+func copyTaskSlices() {
 	workerTasks = make([][]*Task, workerFixedMax)
 
 	for _, task := range repeatingTasks {
 		if task.worker >= 0 {
 			workerTasks[task.worker] = append(workerTasks[task.worker], task)
-		} else{
+		} else {
 			tasks = append(tasks, task)
 		}
 	}
@@ -67,14 +68,14 @@ func copyTaskSlices(){
 	for _, task := range oneTimeTasks {
 		if task.worker >= 0 {
 			workerTasks[task.worker] = append(workerTasks[task.worker], task)
-		} else{
+		} else {
 			tasks = append(tasks, task)
 		}
 	}
 	oneTimeTasks = nil
 }
 
-func dispatchTasks(){
+func dispatchTasks() {
 	workerEmpti := false
 	for !workerEmpti || len(tasks) > 0 {
 
