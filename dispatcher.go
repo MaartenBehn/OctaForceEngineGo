@@ -15,7 +15,7 @@ var (
 func runDispatcher() {
 	wait := time.Duration(1.0 / MaxFPS * 1000000000)
 
-	//syncWorkers()
+	syncWorkers()
 	frameStart = time.Now()
 	for running {
 		diff := time.Since(frameStart)
@@ -32,11 +32,11 @@ func runDispatcher() {
 		frameStart = time.Now()
 
 		copyTaskSlices()
-		//releaseWorkers()
+		releaseWorkers()
 
 		dispatchTasks()
 
-		//syncWorkers()
+		syncWorkers()
 	}
 }
 

@@ -22,10 +22,6 @@
     <list default="true" id="3abefc9d-9325-4d28-b9c5-4a14d5d5f305" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dispatcher.go" beforeDir="false" afterPath="$PROJECT_DIR$/dispatcher.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sceduler.go" beforeDir="false" afterPath="$PROJECT_DIR$/sceduler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/test/main_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transform.go" beforeDir="false" afterPath="$PROJECT_DIR$/transform.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker.go" beforeDir="false" afterPath="$PROJECT_DIR$/worker.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +47,6 @@
   </component>
   <component name="PropertiesComponent">
     <property name="DefaultGoTemplateProperty" value="Go File" />
-    <property name="GO_FMT" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.import.settings.migrated" value="true" />
@@ -64,8 +59,19 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
   </component>
-  <component name="RunManager" selected="Go Test.TestOctaForce in OctaForceEngineGo/test (1)">
+  <component name="RunManager" selected="Go Test.TestOctaForce in OctaForceEngineGo/test (2)">
     <configuration name="TestOctaForce in OctaForceEngineGo/test (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="OctaForce" />
+      <working_directory value="$PROJECT_DIR$/test" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="OctaForceEngineGo/test" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <pattern value="^\QTestOctaForce\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestOctaForce in OctaForceEngineGo/test (2)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="OctaForce" />
       <working_directory value="$PROJECT_DIR$/test" />
       <framework value="gotest" />
@@ -103,9 +109,11 @@
       <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test race" />
       <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test" />
       <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test (1)" />
+      <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test (2)" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test (2)" />
         <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test (1)" />
         <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test" />
       </list>
@@ -129,6 +137,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="FPS and UPS system" />
-    <option name="LAST_COMMIT_MESSAGE" value="FPS and UPS system" />
+    <MESSAGE value="Performance inprovements" />
+    <option name="LAST_COMMIT_MESSAGE" value="Performance inprovements" />
   </component>
 </project>
