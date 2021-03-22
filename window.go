@@ -1,4 +1,4 @@
-package V2
+package OctaForce
 
 import "C"
 import (
@@ -31,11 +31,6 @@ func initWindow() {
 
 	task := NewTask(updateWindow)
 	task.SetRepeating(true)
-	AddTask(task)
-
-	task = NewTask(renderWindow)
-	task.SetRepeating(true)
-	task.SetWorker(workerRender)
 	AddTask(task)
 }
 

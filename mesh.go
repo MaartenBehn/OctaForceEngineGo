@@ -1,4 +1,4 @@
-package V2
+package OctaForce
 
 import (
 	"io/ioutil"
@@ -37,6 +37,9 @@ type Mesh struct {
 
 func NewMesh() *Mesh {
 	return &Mesh{Transform: NewTransform()}
+}
+func (m *Mesh) checkDependency(data Data) bool {
+	return m == data
 }
 
 func renderMeshes() {
@@ -278,7 +281,11 @@ type activeMeshesData struct {
 	meshes []*Mesh
 }
 
-var ActiveMeshesData activeMeshesData
+func initActiveMeshesData() {
+	ActiveMeshesData = &activeMeshesData{}
+}
+
+var ActiveMeshesData *activeMeshesData
 
 func (a *activeMeshesData) AddMesh(mesh *Mesh) {
 	gl.GenVertexArrays(1, &mesh.vao)
@@ -293,4 +300,7 @@ func (a *activeMeshesData) RemoveMesh(mesh *Mesh) {
 	}
 
 	unUsedVAOs = append(unUsedVAOs, mesh.vao)
+}
+func (a *activeMeshesData) checkDependency(data Data) bool {
+	return a == data
 }

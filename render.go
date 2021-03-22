@@ -1,4 +1,4 @@
-package V2
+package OctaForce
 
 import (
 	"fmt"
@@ -86,16 +86,18 @@ func initRenderer() {
 	gl.Enable(gl.DEPTH_TEST)
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0, 0, 0, 0)
+}
 
-	task := NewTask(renderRenderer)
+func runRender() {
+	task := NewTask(func() {
+		renderRenderer()
+		renderWindow()
+		printGlErrors()
+	})
 	task.SetRepeating(true)
-	task.SetWorker(workerRender)
-	AddTask(task)
-
-	task = NewTask(printGlErrors)
-	task.SetRepeating(true)
-	task.SetWorker(workerRender)
-	AddTask(task)
+	task.SetDependencies(ActiveMeshesData, ActiveCamera)
+	addTask <- task
+	task.run()
 }
 
 func renderRenderer() {
@@ -105,9 +107,9 @@ func renderRenderer() {
 		gl.UseProgram(programmData.id)
 
 		// Creating inverted Camera pos
-		view := ActiveCameraData.Camera.Transform.getMatrix().Inv()
+		view := ActiveCamera.Transform.getMatrix().Inv()
 		gl.UniformMatrix4fv(1, 1, false, &view[0])
-		gl.UniformMatrix4fv(0, 1, false, &ActiveCameraData.Camera.projection[0])
+		gl.UniformMatrix4fv(0, 1, false, &ActiveCamera.projection[0])
 
 		programmData.renderFunc()
 
@@ -125,7 +127,6 @@ func deleteUnUsedVAOs() {
 	}
 	unUsedVAOs = []uint32{}
 }
-
 func printGlErrors() {
 	glerror := gl.GetError()
 	if glerror == gl.NO_ERROR {

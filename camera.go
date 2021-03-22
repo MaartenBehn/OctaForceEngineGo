@@ -1,10 +1,10 @@
-package V2
+package OctaForce
 
 import "github.com/go-gl/mathgl/mgl32"
 
 type Camera struct {
 	projection mgl32.Mat4
-	Transform *Transform
+	Transform  *Transform
 }
 
 func NewCamera() *Camera {
@@ -15,9 +15,12 @@ func NewCamera() *Camera {
 			100000.0),
 	}
 }
-
-type activeCameraData struct {
-	Camera *Camera
+func (c *Camera) checkDependency(data Data) bool {
+	return c == data || data == ActiveCamera
 }
-var ActiveCameraData activeCameraData
 
+func initActiveCamera() {
+	ActiveCamera = NewCamera()
+}
+
+var ActiveCamera *Camera

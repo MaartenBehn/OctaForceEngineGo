@@ -19,7 +19,6 @@ func init() {
 }
 
 func TestOctaForce(t *testing.T) {
-	//defer profile.Start().Stop()
 	of.Init(start, stop, "Test")
 }
 
@@ -28,7 +27,7 @@ func start() {
 	camera.Transform = of.NewTransform()
 	camera.Transform.SetPosition(mgl32.Vec3{1000, 1000, 2000})
 
-	of.ActiveCameraData.Camera = camera
+	of.ActiveCamera = camera
 
 	mesh := of.NewMesh()
 	mesh.LoadOBJ(absPath+"/mesh/LowPolySphere.obj", false)
@@ -47,9 +46,9 @@ func start() {
 		//of.AddTask(task)
 	}
 
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 20000; i++ {
 		var instants []*of.MeshInstant
-		for j := 0; j < 10000; j++ {
+		for j := 0; j < 50; j++ {
 			meshInstant := of.NewMeshInstant(mesh, &of.Material{DiffuseColor: [3]float32{1, 0, 1}})
 			meshInstant.Transform.SetPosition(mgl32.Vec3{float32(i) * 10, float32(j) * 10, 0})
 			instants = append(instants, meshInstant)
@@ -67,6 +66,11 @@ func newTask(instants []*of.MeshInstant) {
 		}
 	})
 	task.SetRepeating(true)
+	dependices := make([]of.Data, len(instants))
+	for i, instant := range instants {
+		dependices[i] = instant
+	}
+	task.SetDependencies(dependices...)
 	of.AddTask(task)
 }
 

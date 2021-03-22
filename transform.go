@@ -1,4 +1,4 @@
-package V2
+package OctaForce
 
 import "github.com/go-gl/mathgl/mgl32"
 
@@ -106,4 +106,8 @@ func (transform *Transform) updateMatrix() {
 }
 func (transform *Transform) getMatrix() mgl32.Mat4 {
 	return transform.matrix
+}
+
+func (transform *Transform) checkDependency(data Data) bool {
+	return transform == data
 }

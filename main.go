@@ -1,4 +1,4 @@
-package V2
+package OctaForce
 
 import (
 	"github.com/go-gl/glfw/v3.3/glfw"
@@ -8,6 +8,7 @@ import (
 )
 
 var absPath string
+
 func init() {
 	_, b, _, _ := runtime.Caller(0)
 	absPath = filepath.Dir(b)
@@ -26,14 +27,17 @@ func Init(gameStartFunc func(), gameStopFunc func(), name string) {
 	}
 	defer glfw.Terminate()
 
-	initWorkers()
+	initActiveMeshesData()
+	initActiveCamera()
+
+	initDispatcher()
 	initWindow()
 	initRenderer()
 
 	gameStartFunc()
 
 	go runDispatcher()
-	workers[workerRender].run()
+	runRender()
 
 	gameStopFunc()
 }

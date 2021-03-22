@@ -1,5 +1,5 @@
-package V2
+package OctaForce
 
 type Data interface {
-	Delete()
+	checkDependency(data Data) bool
 }
