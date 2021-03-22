@@ -208,7 +208,7 @@ func pushInstanceData(mesh *Mesh) {
 	gl.BufferData(gl.ARRAY_BUFFER, (len(mesh.instances)+1)*int(instanceStride), gl.Ptr(instanceData), gl.DYNAMIC_DRAW)
 }
 
-// LoadOBJ returns the mesh struct of the given OBJ file.
+// LoadOBJ returns the Mesh struct of the given OBJ file.
 func (m *Mesh) LoadOBJ(path string, loadMaterials bool) {
 
 	content, err := ioutil.ReadFile(path)
@@ -229,7 +229,7 @@ func (m *Mesh) LoadOBJ(path string, loadMaterials bool) {
 		switch values[0] {
 		case "mtllib":
 			if loadMaterials {
-				material = LoadMtl("mesh" + values[1])[0]
+				material = LoadMtl("Mesh" + values[1])[0]
 			}
 			break
 		case "v":
@@ -266,8 +266,8 @@ func (m *Mesh) LoadOBJ(path string, loadMaterials bool) {
 			m.Indices = append(m.Indices, vertexIndex)
 			//goland:noinspection GoNilness
 			m.Vertices[vertexIndex].Position = vertices[vertexIndex]
-			//mesh.Vertices[vertexIndex].UVCord = uvCord[values[1] -1]
-			//mesh.Vertices[vertexIndex].Normal = normals[values[2] -1]
+			//Mesh.Vertices[vertexIndex].UVCord = uvCord[values[1] -1]
+			//Mesh.Vertices[vertexIndex].Normal = normals[values[2] -1]
 		}
 	}
 

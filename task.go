@@ -1,15 +1,15 @@
 package OctaForce
 
-type Task struct {
+type task struct {
 	function  func()
 	repeating bool
 	start     chan bool
 	done      chan bool
-	raceTasks []*Task
+	raceTasks []*task
 }
 
-func NewTask(function func()) *Task {
-	return &Task{
+func NewTask(function func()) *task {
+	return &task{
 		function:  function,
 		repeating: false,
 		start:     make(chan bool),
@@ -17,13 +17,13 @@ func NewTask(function func()) *Task {
 	}
 }
 
-func (t *Task) SetRepeating(repeating bool) {
+func (t *task) SetRepeating(repeating bool) {
 	t.repeating = repeating
 }
-func (t *Task) SetRaceTask(tasks ...*Task) {
+func (t *task) SetRaceTask(tasks ...*task) {
 	t.raceTasks = tasks
 }
-func (t *Task) run() {
+func (t *task) run() {
 	for running {
 		<-t.start
 		t.function()

@@ -13,7 +13,7 @@ type Transform struct {
 	matrix            mgl32.Mat4
 	needsMatrixUpdate bool
 
-	updateTask *Task
+	updateTask *task
 }
 
 func NewTransform() *Transform {
@@ -36,7 +36,7 @@ func (t *Transform) SetPosition(position mgl32.Vec3) {
 	t.updateMatrix()
 }
 func (t *Transform) MoveRelative(vec3 mgl32.Vec3) {
-	if t.rotation[0] != 0 && t.rotation[1] != 0 && t.rotation[2] != 0 {
+	if t.rotation[0] != 0 || t.rotation[1] != 0 || t.rotation[2] != 0 {
 		vec3 = mgl32.TransformCoordinate(vec3, t.getRotateMatrix())
 	}
 
@@ -60,6 +60,7 @@ func (t *Transform) SetRotaion(vec3 mgl32.Vec3) {
 		mgl32.DegToRad(vec3[1]),
 		mgl32.DegToRad(vec3[2])}
 	t.needsRotateMatrixUpdate = true
+	t.needsMatrixUpdate = true
 	t.updateMatrix()
 }
 func (t *Transform) Rotate(vec3 mgl32.Vec3) {
@@ -68,6 +69,7 @@ func (t *Transform) Rotate(vec3 mgl32.Vec3) {
 		t.rotation.Y() + mgl32.DegToRad(vec3.Y()),
 		t.rotation.Z() + mgl32.DegToRad(vec3.Z())}
 	t.needsRotateMatrixUpdate = true
+	t.needsMatrixUpdate = true
 	t.updateMatrix()
 }
 

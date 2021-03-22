@@ -2,21 +2,23 @@ package OctaForce
 
 type Data interface{}
 
+type taskTyp int
+
 const (
-	RenderTask       = 0
-	WindowUpdateTask = 1
-	taskMax          = 2
+	RenderTask       taskTyp = 0
+	WindowUpdateTask taskTyp = 1
+	taskMax                  = 2
 )
 
-var engineTasks []*Task
+var engineTasks []*task
 
 func initState() {
-	engineTasks = make([]*Task, taskMax)
+	engineTasks = make([]*task, taskMax)
 	for i := range engineTasks {
 		engineTasks[i] = NewTask(func() {})
 	}
 }
 
-func GetEngineTask(id int) *Task {
+func GetEngineTask(id taskTyp) *task {
 	return engineTasks[id]
 }

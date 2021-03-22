@@ -10,11 +10,12 @@ var (
 	FPS        float64
 	MaxFPS     float64
 	frameStart time.Time
+	DeltaTime  float64
 )
 
 func initDispatcher() {
-	addTask = make(chan *Task, 1)
-	removeTask = make(chan *Task, 1)
+	addTask = make(chan *task, 1)
+	removeTask = make(chan *task, 1)
 
 	updateTasksListSync = make(chan bool)
 	updateTasksListRelease = make(chan bool)
@@ -45,26 +46,29 @@ func runDispatcher() {
 		log.Print(FPS)
 
 		if diff < wait {
+			DeltaTime = wait.Seconds()
 			time.Sleep(wait - diff)
+		} else {
+			DeltaTime = diff.Seconds()
 		}
 	}
 }
 
-var addTask chan *Task
+var addTask chan *task
 
-func AddTask(task *Task) {
+func AddTask(task *task) {
 	go task.run()
 	addTask <- task
 }
 
-var removeTask chan *Task
+var removeTask chan *task
 
-func RemoveTask(task *Task) {
+func RemoveTask(task *task) {
 	removeTask <- task
 }
 
-var repeatingTasks []*Task
-var oneTimeTasks []*Task
+var repeatingTasks []*task
+var oneTimeTasks []*task
 var updateTasksListSync chan bool
 var updateTasksListRelease chan bool
 
@@ -96,7 +100,7 @@ func updateTasksList() {
 	}
 }
 
-var tasks []*Task
+var tasks []*task
 
 func copyTaskSlices() {
 	tasks = nil
@@ -112,7 +116,7 @@ func copyTaskSlices() {
 }
 
 var done bool
-var aktiveTasks []*Task
+var aktiveTasks []*task
 
 func dispatchTasks() {
 	done = false
@@ -144,7 +148,7 @@ func dispatchTasks() {
 	}
 }
 
-func canStartTask(task *Task) bool {
+func canStartTask(task *task) bool {
 	for _, aktiveTask := range aktiveTasks {
 		for _, raceTask := range task.raceTasks {
 			if aktiveTask == raceTask {

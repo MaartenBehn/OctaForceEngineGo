@@ -21,12 +21,8 @@
   <component name="ChangeListManager">
     <list default="true" id="3abefc9d-9325-4d28-b9c5-4a14d5d5f305" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/camera.go" beforeDir="false" afterPath="$PROJECT_DIR$/camera.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dispatcher.go" beforeDir="false" afterPath="$PROJECT_DIR$/dispatcher.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mesh.go" beforeDir="false" afterPath="$PROJECT_DIR$/mesh.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/meshInstant.go" beforeDir="false" afterPath="$PROJECT_DIR$/meshInstant.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/render.go" beforeDir="false" afterPath="$PROJECT_DIR$/render.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/state.go" beforeDir="false" afterPath="$PROJECT_DIR$/state.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/task.go" beforeDir="false" afterPath="$PROJECT_DIR$/task.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/test/main_test.go" afterDir="false" />
@@ -66,7 +62,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../GravityWaves" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -128,6 +124,10 @@
     <MESSAGE value="FPS and UPS system" />
     <MESSAGE value="Performance inprovements" />
     <MESSAGE value="new Idea" />
-    <option name="LAST_COMMIT_MESSAGE" value="new Idea" />
+    <MESSAGE value="fixed race conditions" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed race conditions" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/OctaForceEngineGo$TestOctaForce_in_OctaForceEngineGo_test.out" NAME="TestOctaForce in OctaForceEngineGo/test Coverage Results" MODIFIED="1616454378223" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="GoCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>
