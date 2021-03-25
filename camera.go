@@ -17,7 +17,14 @@ func NewCamera() *Camera {
 }
 
 func initActiveCamera() {
-	ActiveCamera = NewCamera()
+	activeCamera = NewCamera()
 }
 
-var ActiveCamera *Camera
+var activeCamera *Camera
+
+func GetActiveCamera() *Camera {
+	return activeCamera
+}
+func SetActiveCamera(camera *Camera) {
+	activeCamera = camera
+}

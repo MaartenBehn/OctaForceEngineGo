@@ -40,7 +40,7 @@ func NewMesh() *Mesh {
 }
 
 func renderMeshes() {
-	for _, mesh := range ActiveMeshesData.meshes {
+	for _, mesh := range globalActiveMeshesData.meshes {
 
 		if len(mesh.instances) != 0 {
 			continue
@@ -64,7 +64,7 @@ func renderMeshes() {
 	}
 }
 func renderInstantMeshes() {
-	for _, mesh := range ActiveMeshesData.meshes {
+	for _, mesh := range globalActiveMeshesData.meshes {
 
 		if len(mesh.instances) == 0 {
 			continue
@@ -279,10 +279,14 @@ type activeMeshesData struct {
 }
 
 func initActiveMeshesData() {
-	ActiveMeshesData = &activeMeshesData{}
+	globalActiveMeshesData = &activeMeshesData{}
 }
 
-var ActiveMeshesData *activeMeshesData
+var globalActiveMeshesData *activeMeshesData
+
+func GetActiveMeshes() *activeMeshesData {
+	return globalActiveMeshesData
+}
 
 func (a *activeMeshesData) AddMesh(mesh *Mesh) {
 	gl.GenVertexArrays(1, &mesh.vao)

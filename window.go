@@ -2,6 +2,7 @@ package OctaForce
 
 import "C"
 import (
+	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/go-gl/glfw/v3.3/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 )
@@ -12,22 +13,30 @@ const (
 )
 
 var window *glfw.Window
-var windowName string
+
+func SetWindowName(name string) {
+	window.SetTitle(name)
+}
 
 func initWindow() {
 	var err error
 
+	err = glfw.Init()
+	if err != nil {
+		panic(err)
+	}
 	// Setting up Window
 	glfw.WindowHint(glfw.Resizable, glfw.False)
 	glfw.WindowHint(glfw.ContextVersionMajor, 4)
 	glfw.WindowHint(glfw.ContextVersionMinor, 1)
 	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
-	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
-	window, err = glfw.CreateWindow(windowWidth, windowHeight, windowName, nil, nil)
+	glfw.WindowHint(glfw.OpenGLForwardCompatible, gl.TRUE)
+	window, err = glfw.CreateWindow(windowWidth, windowHeight, "New OctaForce Window", nil, nil)
 	if err != nil {
 		panic(err)
 	}
 	window.MakeContextCurrent()
+	glfw.SwapInterval(1)
 
 	*engineTasks[WindowUpdateTask] = *NewTask(updateWindow)
 	engineTasks[WindowUpdateTask].SetRepeating(true)
@@ -210,7 +219,7 @@ func GetMousePos() mgl32.Vec2 {
 
 var mouseMovement mgl32.Vec2
 
-// GetMouseMovement returns the relative movement since the updateMatrix.
+// GetMouseMovement returns the relative movement.
 func GetMouseMovement() mgl32.Vec2 {
 	return mouseMovement
 }

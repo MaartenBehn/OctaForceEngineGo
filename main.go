@@ -14,30 +14,37 @@ func init() {
 	absPath = filepath.Dir(b)
 }
 
-func Init(gameStartFunc func(), gameStopFunc func(), name string) {
+var stopCallback func()
+
+func SetStopCallback(function func()) {
+	stopCallback = function
+}
+
+func Init(start func()) {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	runtime.LockOSThread()
 
-	MaxFPS = 60
+	maxFPS = 60
 	running = true
-	windowName = name
-
-	if err := glfw.Init(); err != nil {
-		log.Fatalln("failed to initialize glfw:", err)
-	}
-	defer glfw.Terminate()
 
 	initState()
 	initActiveMeshesData()
 	initActiveCamera()
 	initDispatcher()
+
 	initWindow()
 	initRenderer()
+	//initGui()
 
-	gameStartFunc()
+	start()
 
 	go runDispatcher()
 	runRender()
 
-	gameStopFunc()
+	if stopCallback != nil {
+		stopCallback()
+	}
+
+	glfw.Terminate()
+	gui.context.Destroy()
 }

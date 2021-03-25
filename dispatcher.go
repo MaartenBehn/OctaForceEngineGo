@@ -7,11 +7,15 @@ import (
 
 var (
 	running    bool
-	FPS        float64
-	MaxFPS     float64
+	fps        float64
+	maxFPS     float64
 	frameStart time.Time
-	DeltaTime  float64
+	deltaTime  float64
 )
+
+func GetDeltaTime() float64 {
+	return deltaTime
+}
 
 func initDispatcher() {
 	addTask = make(chan *task, 1)
@@ -24,7 +28,7 @@ func initDispatcher() {
 }
 
 func runDispatcher() {
-	wait := time.Duration(1.0 / MaxFPS * 1000000000)
+	wait := time.Duration(1.0 / maxFPS * 1000000000)
 
 	for running {
 		frameStart = time.Now()
@@ -39,17 +43,17 @@ func runDispatcher() {
 
 		diff := time.Since(frameStart)
 		if diff > 0 {
-			FPS = (wait.Seconds() / diff.Seconds()) * MaxFPS
+			fps = (wait.Seconds() / diff.Seconds()) * maxFPS
 		} else {
-			FPS = 10000
+			fps = 10000
 		}
-		log.Print(FPS)
+		log.Print(fps)
 
 		if diff < wait {
-			DeltaTime = wait.Seconds()
+			deltaTime = wait.Seconds()
 			time.Sleep(wait - diff)
 		} else {
-			DeltaTime = diff.Seconds()
+			deltaTime = diff.Seconds()
 		}
 	}
 }
