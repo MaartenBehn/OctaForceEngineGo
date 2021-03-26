@@ -20,13 +20,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3abefc9d-9325-4d28-b9c5-4a14d5d5f305" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/render/demo/Window.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/render/demo/doc.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/render/example/Run.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/render/example/doc.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/render/main.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/render/platforms/constants.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/render/platforms/doc.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/render/platforms/errors.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/render/platforms/glfw.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/render/renderers/OpenGL2.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/render/renderers/OpenGL3.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/render/renderers/doc.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shader/guiFragmentShader.shader" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shader/guiVertexShader.shader" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dispatcher.go" beforeDir="false" afterPath="$PROJECT_DIR$/dispatcher.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mesh.go" beforeDir="false" afterPath="$PROJECT_DIR$/mesh.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/state.go" beforeDir="false" afterPath="$PROJECT_DIR$/state.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/task.go" beforeDir="false" afterPath="$PROJECT_DIR$/task.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/render.go" beforeDir="false" afterPath="$PROJECT_DIR$/render.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shader.go" beforeDir="false" afterPath="$PROJECT_DIR$/shader.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/test/main_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transform.go" beforeDir="false" afterPath="$PROJECT_DIR$/transform.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/window.go" beforeDir="false" afterPath="$PROJECT_DIR$/window.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -49,20 +63,33 @@
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="ProjectId" id="1hK3FjOMhoG7NPL5SqDr5s0UQxI" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
     <option name="showMembers" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../GravityWaves" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/render" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -70,7 +97,21 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
   </component>
-  <component name="RunManager" selected="Go Test.TestOctaForce in OctaForceEngineGo/test">
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\dev\Go\src\OctaForceEngineGo\render" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Go Build.go build OctaForceEngineGo/render">
+    <configuration name="go build OctaForceEngineGo/render" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="OctaForce" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <filePath value="$PROJECT_DIR$/render/main.go" />
+      <package value="OctaForceEngineGo/render" />
+      <directory value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
     <configuration name="TestOctaForce in OctaForceEngineGo/test race" type="GoTestRunConfiguration" factoryName="Go Test">
       <module name="OctaForce" />
       <working_directory value="$PROJECT_DIR$/test" />
@@ -97,9 +138,11 @@
     <list>
       <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test race" />
       <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test" />
+      <item itemvalue="Go Build.go build OctaForceEngineGo/render" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Build.go build OctaForceEngineGo/render" />
         <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test" />
       </list>
     </recent_temporary>
@@ -121,6 +164,7 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="FPS and UPS system" />
     <MESSAGE value="Performance inprovements" />
     <MESSAGE value="new Idea" />

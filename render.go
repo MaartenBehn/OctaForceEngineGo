@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/go-gl/gl/v4.1-core/gl"
+	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
 var (
@@ -91,6 +91,7 @@ func initRenderer() {
 func runRender() {
 	*engineTasks[RenderTask] = *NewTask(func() {
 		renderRenderer()
+		renderGui()
 		renderWindow()
 		printGlErrors()
 	})

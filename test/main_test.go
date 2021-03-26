@@ -64,7 +64,7 @@ func start() {
 	mesh.Material = of.Material{DiffuseColor: [3]float32{1, 1, 1}}
 	of.ActiveMeshesData.AddMesh(mesh)
 
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 10; i++ {
 		var instants []*of.MeshInstant
 		for j := 0; j < 1000; j++ {
 			meshInstant := of.NewMeshInstant(mesh, &of.Material{DiffuseColor: [3]float32{1, 0, 1}})

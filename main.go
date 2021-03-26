@@ -31,8 +31,10 @@ func Init(gameStartFunc func(), gameStopFunc func(), name string) {
 	initActiveMeshesData()
 	initActiveCamera()
 	initDispatcher()
+
 	initWindow()
 	initRenderer()
+	initGui()
 
 	gameStartFunc()
 
