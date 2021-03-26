@@ -24,15 +24,12 @@ var programmDatas []programmData
 func initRenderer() {
 
 	var err error
-	// Initialize Gl
-	if err = gl.Init(); err != nil {
+	err = gl.Init()
+	if err != nil {
 		panic(err)
 	}
 	version = gl.GoStr(gl.GetString(gl.VERSION))
 	fmt.Println("OpenGL version", version)
-
-	gl.Enable(gl.DEBUG_OUTPUT)
-	gl.DebugMessageCallback(nil, nil)
 
 	programmDatas = make([]programmData, 2)
 	programmDatas[0] = programmData{
@@ -83,8 +80,13 @@ func initRenderer() {
 	}
 
 	// Global settings
-	gl.Enable(gl.DEPTH_TEST)
-	gl.DepthFunc(gl.LESS)
+	gl.Enable(gl.BLEND)
+	gl.BlendEquation(gl.FUNC_ADD)
+	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+	gl.Disable(gl.CULL_FACE)
+	gl.Disable(gl.DEPTH_TEST)
+	gl.Enable(gl.SCISSOR_TEST)
+	gl.PolygonMode(gl.FRONT_AND_BACK, gl.FILL)
 	gl.ClearColor(0, 0, 0, 0)
 }
 
@@ -107,9 +109,9 @@ func renderRenderer() {
 		gl.UseProgram(programmData.id)
 
 		// Creating inverted Camera pos
-		view := ActiveCamera.Transform.getMatrix().Inv()
+		view := activeCamera.Transform.getMatrix().Inv()
 		gl.UniformMatrix4fv(1, 1, false, &view[0])
-		gl.UniformMatrix4fv(0, 1, false, &ActiveCamera.projection[0])
+		gl.UniformMatrix4fv(0, 1, false, &activeCamera.projection[0])
 
 		programmData.renderFunc()
 
