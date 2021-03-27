@@ -1,6 +1,8 @@
 package OctaForce
 
-import "github.com/go-gl/mathgl/mgl32"
+import (
+	"github.com/go-gl/mathgl/mgl32"
+)
 
 type Camera struct {
 	projection mgl32.Mat4
@@ -10,7 +12,7 @@ type Camera struct {
 func NewCamera() *Camera {
 	return &Camera{
 		projection: mgl32.Perspective(mgl32.DegToRad(45.0),
-			float32(windowWidth)/windowHeight,
+			float32(WindowWidth)/float32(WindowHeight),
 			0.1,
 			100000.0),
 	}

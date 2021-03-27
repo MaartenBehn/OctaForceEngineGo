@@ -300,5 +300,5 @@ func (a *activeMeshesData) RemoveMesh(mesh *Mesh) {
 		}
 	}
 
-	unUsedVAOs = append(unUsedVAOs, mesh.vao)
+	//unUsedVAOs = append(unUsedVAOs, mesh.vao)
 }

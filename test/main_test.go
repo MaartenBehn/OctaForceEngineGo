@@ -19,7 +19,7 @@ func init() {
 }
 
 func TestOctaForce(t *testing.T) {
-	of.Init(start, stop, "Test")
+	of.Init(start)
 }
 
 const (
@@ -32,28 +32,30 @@ func start() {
 	camera.Transform = of.NewTransform()
 	camera.Transform.SetPosition(mgl32.Vec3{0, 0, 200})
 
-	of.ActiveCamera = camera
+	of.SetActiveCamera(camera)
 
 	task := of.NewTask(func() {
+		/*
+			deltaTime := float32(of.DeltaTime)
+			if of.KeyPressed(of.KeyW) {
+				camera.Transform.MoveRelative(mgl32.Vec3{0, 0, -1}.Mul(deltaTime * movementSpeed))
+			}
+			if of.KeyPressed(of.KeyS) {
+				camera.Transform.MoveRelative(mgl32.Vec3{0, 0, 1}.Mul(deltaTime * movementSpeed))
+			}
+			if of.KeyPressed(of.KeyA) {
+				camera.Transform.MoveRelative(mgl32.Vec3{-1, 0, 0}.Mul(deltaTime * movementSpeed))
+			}
+			if of.KeyPressed(of.KeyD) {
+				camera.Transform.MoveRelative(mgl32.Vec3{1, 0, 0}.Mul(deltaTime * movementSpeed))
+			}
+			if of.MouseButtonPressed(of.MouseButtonLeft) {
+				mouseMovement := of.GetMouseMovement()
+				camera.Transform.Rotate(mgl32.Vec3{-1, 0, 0}.Mul(mouseMovement.Y() * deltaTime * mouseSpeed))
+				camera.Transform.Rotate(mgl32.Vec3{0, -1, 0}.Mul(mouseMovement.X() * deltaTime * mouseSpeed))
+			}
+		*/
 
-		deltaTime := float32(of.DeltaTime)
-		if of.KeyPressed(of.KeyW) {
-			camera.Transform.MoveRelative(mgl32.Vec3{0, 0, -1}.Mul(deltaTime * movementSpeed))
-		}
-		if of.KeyPressed(of.KeyS) {
-			camera.Transform.MoveRelative(mgl32.Vec3{0, 0, 1}.Mul(deltaTime * movementSpeed))
-		}
-		if of.KeyPressed(of.KeyA) {
-			camera.Transform.MoveRelative(mgl32.Vec3{-1, 0, 0}.Mul(deltaTime * movementSpeed))
-		}
-		if of.KeyPressed(of.KeyD) {
-			camera.Transform.MoveRelative(mgl32.Vec3{1, 0, 0}.Mul(deltaTime * movementSpeed))
-		}
-		if of.MouseButtonPressed(of.MouseButtonLeft) {
-			mouseMovement := of.GetMouseMovement()
-			camera.Transform.Rotate(mgl32.Vec3{-1, 0, 0}.Mul(mouseMovement.Y() * deltaTime * mouseSpeed))
-			camera.Transform.Rotate(mgl32.Vec3{0, -1, 0}.Mul(mouseMovement.X() * deltaTime * mouseSpeed))
-		}
 	})
 	task.SetRepeating(true)
 	task.SetRaceTask(of.GetEngineTask(of.WindowUpdateTask), of.GetEngineTask(of.RenderTask))
@@ -62,7 +64,7 @@ func start() {
 	mesh := of.NewMesh()
 	mesh.LoadOBJ(absPath+"/mesh/LowPolySphere.obj", false)
 	mesh.Material = of.Material{DiffuseColor: [3]float32{1, 1, 1}}
-	of.ActiveMeshesData.AddMesh(mesh)
+	of.GetActiveMeshes().AddMesh(mesh)
 
 	for i := 0; i < 10; i++ {
 		var instants []*of.MeshInstant
