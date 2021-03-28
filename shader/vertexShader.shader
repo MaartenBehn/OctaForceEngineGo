@@ -2,6 +2,7 @@
 
 layout(location = 0) uniform mat4 projection;
 layout(location = 1) uniform mat4 camera;
+
 layout(location = 2) uniform mat4 transform;
 layout(location = 3) uniform vec3 inColor;
 

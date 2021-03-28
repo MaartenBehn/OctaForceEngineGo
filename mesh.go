@@ -204,7 +204,6 @@ func pushInstanceData(mesh *Mesh) {
 	}
 	mesh.instanceData = instanceData
 
-	gl.BindBuffer(gl.ARRAY_BUFFER, mesh.instanceVBO)
 	gl.BufferData(gl.ARRAY_BUFFER, (len(mesh.instances)+1)*int(instanceStride), gl.Ptr(instanceData), gl.DYNAMIC_DRAW)
 }
 

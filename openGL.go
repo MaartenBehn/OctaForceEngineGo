@@ -236,13 +236,13 @@ func renderImGui(displaySize [2]float32, framebufferSize [2]float32, drawData im
 }
 
 func render3D() {
+	// Creating inverted Camera pos
+	view := activeCamera.Transform.getMatrix().Inv()
+	gl.UniformMatrix4fv(1, 1, false, &view[0])
+	gl.UniformMatrix4fv(0, 1, false, &activeCamera.projection[0])
+
 	for _, programmData := range programmDatas {
 		gl.UseProgram(programmData.id)
-
-		// Creating inverted Camera pos
-		view := activeCamera.Transform.getMatrix().Inv()
-		gl.UniformMatrix4fv(1, 1, false, &view[0])
-		gl.UniformMatrix4fv(0, 1, false, &activeCamera.projection[0])
 
 		programmData.renderFunc()
 	}
