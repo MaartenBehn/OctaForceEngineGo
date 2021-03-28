@@ -78,7 +78,7 @@ func preRender(clearColor [3]float32) {
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 }
 
-func render(displaySize [2]float32, framebufferSize [2]float32, drawData imgui.DrawData) {
+func renderImGui(displaySize [2]float32, framebufferSize [2]float32, drawData imgui.DrawData) {
 	// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
 	displayWidth, displayHeight := displaySize[0], displaySize[1]
 	fbWidth, fbHeight := framebufferSize[0], framebufferSize[1]
@@ -233,4 +233,17 @@ func render(displaySize [2]float32, framebufferSize [2]float32, drawData imgui.D
 	gl.PolygonMode(gl.FRONT_AND_BACK, uint32(lastPolygonMode[0]))
 	gl.Viewport(lastViewport[0], lastViewport[1], lastViewport[2], lastViewport[3])
 	gl.Scissor(lastScissorBox[0], lastScissorBox[1], lastScissorBox[2], lastScissorBox[3])
+}
+
+func render3D() {
+	for _, programmData := range programmDatas {
+		gl.UseProgram(programmData.id)
+
+		// Creating inverted Camera pos
+		view := activeCamera.Transform.getMatrix().Inv()
+		gl.UniformMatrix4fv(1, 1, false, &view[0])
+		gl.UniformMatrix4fv(0, 1, false, &activeCamera.projection[0])
+
+		programmData.renderFunc()
+	}
 }

@@ -2,7 +2,6 @@ package OctaForce
 
 import (
 	"fmt"
-	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/inkyblackness/imgui-go"
 	"path/filepath"
 	"runtime"
@@ -31,7 +30,12 @@ var (
 	fps              float64
 	renderFrameStart time.Time
 	renderDeltaTime  float64
+	imGuiFunc        func()
 )
+
+func SetImGuiFunc(function func()) {
+	imGuiFunc = function
+}
 
 func runRender() {
 
@@ -53,22 +57,16 @@ func runRender() {
 		imgui.Text(fmt.Sprintf("FPS : %.0f", fps))
 		imgui.Text(fmt.Sprintf("UPS : %.0f", ups))
 
+		if imGuiFunc != nil {
+			imGuiFunc()
+		}
+
 		imgui.Render()
 
 		preRender(clearColor)
 
-		for _, programmData := range programmDatas {
-			gl.UseProgram(programmData.id)
-
-			// Creating inverted Camera pos
-			view := activeCamera.Transform.getMatrix().Inv()
-			gl.UniformMatrix4fv(1, 1, false, &view[0])
-			gl.UniformMatrix4fv(0, 1, false, &activeCamera.projection[0])
-
-			programmData.renderFunc()
-		}
-
-		render(DisplaySize(), FramebufferSize(), imgui.RenderedDrawData())
+		render3D()
+		renderImGui(DisplaySize(), FramebufferSize(), imgui.RenderedDrawData())
 		postRender()
 
 		diff := time.Since(renderFrameStart)

@@ -28,7 +28,6 @@ const (
 )
 
 func start() {
-
 	camera := of.NewCamera()
 
 	camera.Transform = of.NewTransform()
@@ -66,9 +65,9 @@ func start() {
 	mesh.Material = of.Material{DiffuseColor: [3]float32{1, 1, 1}}
 	of.GetActiveMeshes().AddMesh(mesh)
 
-	for i := 0; i < 50; i++ {
+	for i := 0; i < 1000; i++ {
 		var instants []*of.MeshInstant
-		for j := 0; j < 100; j++ {
+		for j := 0; j < 1000; j++ {
 			meshInstant := of.NewMeshInstant(mesh, &of.Material{DiffuseColor: [3]float32{1, 0, 1}})
 			meshInstant.Transform.SetPosition(mgl32.Vec3{float32(i) * 10, float32(j) * 10, 0})
 			instants = append(instants, meshInstant)
@@ -76,7 +75,6 @@ func start() {
 
 		newTask(instants)
 	}
-
 }
 
 func newTask(instants []*of.MeshInstant) {

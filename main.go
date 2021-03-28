@@ -5,6 +5,12 @@ import (
 	"runtime"
 )
 
+var stopFunc func()
+
+func SetStopFunc(function func()) {
+	stopFunc = function
+}
+
 func Init(gameStartFunc func()) {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	runtime.LockOSThread()
@@ -24,4 +30,8 @@ func Init(gameStartFunc func()) {
 
 	go runDispatcher()
 	runRender()
+
+	if stopFunc != nil {
+		stopFunc()
+	}
 }
