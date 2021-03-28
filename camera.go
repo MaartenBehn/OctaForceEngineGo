@@ -15,6 +15,7 @@ func NewCamera() *Camera {
 			float32(WindowWidth)/float32(WindowHeight),
 			0.1,
 			100000.0),
+		Transform: NewTransform(),
 	}
 }
 

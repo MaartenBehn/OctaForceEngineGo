@@ -1,16 +1,76 @@
 package OctaForce
 
 import (
-	"github.com/go-gl/gl/v3.2-core/gl"
+	"fmt"
+	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/inkyblackness/imgui-go"
+	"strings"
 	"unsafe"
 )
+
+type programmData struct {
+	vertexPath   string
+	fragmentPath string
+	id           uint32
+	renderFunc   func()
+}
+
+var programmDatas []programmData
 
 func initOpenGL() {
 	err := gl.Init()
 	if err != nil {
 		panic(err)
 	}
+
+	programmDatas = make([]programmData, 2)
+	programmDatas[0] = programmData{
+		vertexPath:   "/shader/vertexShader.shader",
+		fragmentPath: "/shader/fragmentShader.shader",
+		renderFunc:   renderMeshes,
+	}
+	programmDatas[1] = programmData{
+		vertexPath:   "/shader/vertexShaderInstancing.shader",
+		fragmentPath: "/shader/fragmentShader.shader",
+		renderFunc:   renderInstantMeshes,
+	}
+
+	for i, programmData := range programmDatas {
+		// Configure the vertex and fragment shaders
+		vertexShader, err := compileShader(absPath+programmData.vertexPath, gl.VERTEX_SHADER)
+		if err != nil {
+			panic(err)
+		}
+		fragmentShader, err := compileShader(absPath+programmData.fragmentPath, gl.FRAGMENT_SHADER)
+		if err != nil {
+			panic(err)
+		}
+
+		program := gl.CreateProgram()
+		gl.AttachShader(program, vertexShader)
+		gl.AttachShader(program, fragmentShader)
+		gl.LinkProgram(program)
+		var status int32
+		gl.GetProgramiv(program, gl.LINK_STATUS, &status)
+		if status == gl.FALSE {
+			var logLength int32
+			gl.GetProgramiv(program, gl.INFO_LOG_LENGTH, &logLength)
+
+			log := strings.Repeat("\x00", int(logLength+1))
+			gl.GetProgramInfoLog(program, logLength, nil, gl.Str(log))
+
+			panic(fmt.Errorf("failed to link program: %v", log))
+		}
+		gl.DeleteShader(vertexShader)
+		gl.DeleteShader(fragmentShader)
+
+		// Output data Flag
+		gl.BindFragDataLocation(program, 0, gl.Str("outputColor\x00"))
+
+		programmData.id = program
+		programmDatas[i] = programmData
+	}
+
 }
 
 func preRender(clearColor [3]float32) {

@@ -1,20 +1,19 @@
 package OctaForce
 
 import (
-	"log"
 	"time"
 )
 
 var (
-	running    bool
-	fps        float64
-	maxFPS     float64
-	frameStart time.Time
-	deltaTime  float64
+	running          bool
+	ups              float64
+	maxUPS           float64
+	updateFrameStart time.Time
+	updateDeltaTime  float64
 )
 
 func GetDeltaTime() float64 {
-	return deltaTime
+	return updateDeltaTime
 }
 
 func initDispatcher() {
@@ -28,10 +27,10 @@ func initDispatcher() {
 }
 
 func runDispatcher() {
-	wait := time.Duration(1.0 / maxFPS * 1000000000)
+	wait := time.Duration(1.0 / maxUPS * 1000000000)
 
 	for running {
-		frameStart = time.Now()
+		updateFrameStart = time.Now()
 
 		updateTasksListSync <- true
 
@@ -41,19 +40,18 @@ func runDispatcher() {
 
 		dispatchTasks()
 
-		diff := time.Since(frameStart)
+		diff := time.Since(updateFrameStart)
 		if diff > 0 {
-			fps = (wait.Seconds() / diff.Seconds()) * maxFPS
+			ups = (wait.Seconds() / diff.Seconds()) * maxUPS
 		} else {
-			fps = 10000
+			ups = 10000
 		}
-		log.Print(fps)
 
 		if diff < wait {
-			deltaTime = wait.Seconds()
+			updateDeltaTime = wait.Seconds()
 			time.Sleep(wait - diff)
 		} else {
-			deltaTime = diff.Seconds()
+			updateDeltaTime = diff.Seconds()
 		}
 	}
 }

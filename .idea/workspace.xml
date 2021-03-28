@@ -20,37 +20,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3abefc9d-9325-4d28-b9c5-4a14d5d5f305" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/glfw.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/imgui.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/openGL.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shader/fragmentShader.shader" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shader/guiFragmentShader.shader" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shader/guiVertexShader.shader" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shader/vertexShader.shader" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shader/vertexShaderInstancing.shader" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/imgui.ini" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/camera.go" beforeDir="false" afterPath="$PROJECT_DIR$/camera.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/imgui.ini" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dispatcher.go" beforeDir="false" afterPath="$PROJECT_DIR$/dispatcher.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/glfw.go" beforeDir="false" afterPath="$PROJECT_DIR$/glfw.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/imgui.go" beforeDir="false" afterPath="$PROJECT_DIR$/imgui.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mesh.go" beforeDir="false" afterPath="$PROJECT_DIR$/mesh.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/openGL.go" beforeDir="false" afterPath="$PROJECT_DIR$/openGL.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/render.go" beforeDir="false" afterPath="$PROJECT_DIR$/render.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/render/demo/Window.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/render/demo/doc.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/render/example/Run.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/render/example/doc.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/render/main.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/render/platforms/constants.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/render/platforms/doc.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/render/platforms/errors.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/render/platforms/glfw.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/render/renderers/OpenGL2.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/render/renderers/OpenGL3.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/render/renderers/doc.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/shader.go" beforeDir="false" afterPath="$PROJECT_DIR$/shader.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shader/fragmentShader.shader" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shader/guiFragmentShader.shader" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shader/guiVertexShader.shader" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shader/vertexShader.shader" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shader/vertexShaderInstancing.shader" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/test/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/test/main_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/window.go" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,10 +93,11 @@
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="goland.project.structure" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\dev\Go\src\OctaForceEngineGo" />
       <recent name="D:\dev\Go\src\OctaForceEngineGo\render" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -120,6 +107,18 @@
     </key>
   </component>
   <component name="RunManager" selected="Go Test.TestOctaForce in OctaForceEngineGo/test">
+    <configuration name="TestOctaForce in OctaForceEngineGo/test race" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true">
+      <module name="OctaForce" />
+      <working_directory value="$PROJECT_DIR$/test" />
+      <go_parameters value="-race" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="OctaForceEngineGo/test" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <pattern value="^\QTestOctaForce\E$" />
+      <method v="2" />
+    </configuration>
     <configuration name="TestOctaForce in OctaForceEngineGo/test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="OctaForce" />
       <working_directory value="$PROJECT_DIR$/test" />
@@ -131,45 +130,14 @@
       <pattern value="^\QTestOctaForce\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestRender in OctaForceEngineGo/render (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="OctaForce" />
-      <working_directory value="$PROJECT_DIR$/render" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="OctaForceEngineGo/render" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <pattern value="^\QTestRender\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestRender in OctaForceEngineGo/render" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="OctaForce" />
-      <working_directory value="$PROJECT_DIR$/render" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="OctaForceEngineGo/render" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <pattern value="^\QTestRender\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestRenderWithEngine in OctaForceEngineGo/render" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="OctaForce" />
-      <working_directory value="$PROJECT_DIR$/render" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="OctaForceEngineGo/render" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <pattern value="^\QTestRenderWithEngine\E$" />
-      <method v="2" />
-    </configuration>
+    <list>
+      <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test race" />
+      <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test" />
-        <item itemvalue="Go Test.TestRenderWithEngine in OctaForceEngineGo/render" />
-        <item itemvalue="Go Test.TestRender in OctaForceEngineGo/render (1)" />
-        <item itemvalue="Go Test.TestRender in OctaForceEngineGo/render" />
+        <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test race" />
       </list>
     </recent_temporary>
   </component>

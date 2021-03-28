@@ -9,7 +9,8 @@ func Init(gameStartFunc func()) {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	runtime.LockOSThread()
 
-	maxFPS = 60
+	maxUPS = 60
+	maxFPS = 30
 	running = true
 
 	initState()
@@ -17,10 +18,10 @@ func Init(gameStartFunc func()) {
 	initActiveCamera()
 	initDispatcher()
 
-	InitRender()
+	initRender()
 
 	gameStartFunc()
 
 	go runDispatcher()
-	RunRender()
+	runRender()
 }

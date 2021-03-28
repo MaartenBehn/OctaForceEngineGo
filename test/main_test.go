@@ -28,34 +28,34 @@ const (
 )
 
 func start() {
+
 	camera := of.NewCamera()
+
 	camera.Transform = of.NewTransform()
 	camera.Transform.SetPosition(mgl32.Vec3{0, 0, 200})
 
 	of.SetActiveCamera(camera)
 
 	task := of.NewTask(func() {
-		/*
-			deltaTime := float32(of.DeltaTime)
-			if of.KeyPressed(of.KeyW) {
-				camera.Transform.MoveRelative(mgl32.Vec3{0, 0, -1}.Mul(deltaTime * movementSpeed))
-			}
-			if of.KeyPressed(of.KeyS) {
-				camera.Transform.MoveRelative(mgl32.Vec3{0, 0, 1}.Mul(deltaTime * movementSpeed))
-			}
-			if of.KeyPressed(of.KeyA) {
-				camera.Transform.MoveRelative(mgl32.Vec3{-1, 0, 0}.Mul(deltaTime * movementSpeed))
-			}
-			if of.KeyPressed(of.KeyD) {
-				camera.Transform.MoveRelative(mgl32.Vec3{1, 0, 0}.Mul(deltaTime * movementSpeed))
-			}
-			if of.MouseButtonPressed(of.MouseButtonLeft) {
-				mouseMovement := of.GetMouseMovement()
-				camera.Transform.Rotate(mgl32.Vec3{-1, 0, 0}.Mul(mouseMovement.Y() * deltaTime * mouseSpeed))
-				camera.Transform.Rotate(mgl32.Vec3{0, -1, 0}.Mul(mouseMovement.X() * deltaTime * mouseSpeed))
-			}
-		*/
 
+		deltaTime := float32(of.GetDeltaTime())
+		if of.KeyPressed(of.KeyW) {
+			camera.Transform.MoveRelative(mgl32.Vec3{0, 0, -1}.Mul(deltaTime * movementSpeed))
+		}
+		if of.KeyPressed(of.KeyS) {
+			camera.Transform.MoveRelative(mgl32.Vec3{0, 0, 1}.Mul(deltaTime * movementSpeed))
+		}
+		if of.KeyPressed(of.KeyA) {
+			camera.Transform.MoveRelative(mgl32.Vec3{-1, 0, 0}.Mul(deltaTime * movementSpeed))
+		}
+		if of.KeyPressed(of.KeyD) {
+			camera.Transform.MoveRelative(mgl32.Vec3{1, 0, 0}.Mul(deltaTime * movementSpeed))
+		}
+		if of.MouseButtonPressed(of.MouseButtonLeft) {
+			mouseMovement := of.GetMouseMovement()
+			camera.Transform.Rotate(mgl32.Vec3{-1, 0, 0}.Mul(mouseMovement.Y() * deltaTime * mouseSpeed))
+			camera.Transform.Rotate(mgl32.Vec3{0, -1, 0}.Mul(mouseMovement.X() * deltaTime * mouseSpeed))
+		}
 	})
 	task.SetRepeating(true)
 	task.SetRaceTask(of.GetEngineTask(of.WindowUpdateTask), of.GetEngineTask(of.RenderTask))
@@ -66,9 +66,9 @@ func start() {
 	mesh.Material = of.Material{DiffuseColor: [3]float32{1, 1, 1}}
 	of.GetActiveMeshes().AddMesh(mesh)
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 50; i++ {
 		var instants []*of.MeshInstant
-		for j := 0; j < 1000; j++ {
+		for j := 0; j < 100; j++ {
 			meshInstant := of.NewMeshInstant(mesh, &of.Material{DiffuseColor: [3]float32{1, 0, 1}})
 			meshInstant.Transform.SetPosition(mgl32.Vec3{float32(i) * 10, float32(j) * 10, 0})
 			instants = append(instants, meshInstant)
@@ -76,6 +76,7 @@ func start() {
 
 		newTask(instants)
 	}
+
 }
 
 func newTask(instants []*of.MeshInstant) {
