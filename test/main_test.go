@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 )
-import of "OctaForceEngineGo"
+import of "github.com/Stroby241/OctaForceEngineGo"
 
 var absPath string
 

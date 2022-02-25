@@ -94,36 +94,49 @@
       <recent name="D:\dev\Go\src\OctaForceEngineGo\render" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestOctaForce in OctaForceEngineGo/test">
+  <component name="RunManager" selected="Go Test.TestOctaForce in github.com/Stroby241/OctaForceEngineGo/test">
     <configuration name="TestOctaForce in OctaForceEngineGo/test race" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true">
       <module name="OctaForce" />
       <working_directory value="$PROJECT_DIR$/test" />
       <go_parameters value="-race" />
-      <framework value="gotest" />
       <kind value="PACKAGE" />
       <package value="OctaForceEngineGo/test" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
       <pattern value="^\QTestOctaForce\E$" />
       <method v="2" />
     </configuration>
     <configuration name="TestOctaForce in OctaForceEngineGo/test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="OctaForce" />
       <working_directory value="$PROJECT_DIR$/test" />
-      <framework value="gotest" />
       <kind value="PACKAGE" />
       <package value="OctaForceEngineGo/test" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestOctaForce\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestOctaForce in github.com/Stroby241/OctaForceEngineGo/test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="OctaForce" />
+      <working_directory value="$PROJECT_DIR$/test" />
+      <kind value="PACKAGE" />
+      <package value="github.com/Stroby241/OctaForceEngineGo/test" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
       <pattern value="^\QTestOctaForce\E$" />
       <method v="2" />
     </configuration>
     <list>
       <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test race" />
       <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test" />
+      <item itemvalue="Go Test.TestOctaForce in github.com/Stroby241/OctaForceEngineGo/test" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestOctaForce in github.com/Stroby241/OctaForceEngineGo/test" />
         <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test" />
         <item itemvalue="Go Test.TestOctaForce in OctaForceEngineGo/test race" />
       </list>
